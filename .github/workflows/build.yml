@@ -1,0 +1,63 @@
+name: Build ifswp2cm
+
+on:
+  # workflow_dispatch:
+  push:
+    # branches: [ "main" ]
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Install dev tools
+      run: |
+        sudo apt install cmake pkg-config ninja-build mingw-w64
+        sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+        sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+        sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+        sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+
+    - name: Build ifswp2cm
+      run:  |
+        cmake -G Ninja -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++
+        cmake --build build_32_release --config Release --target install
+        cmake -G Ninja -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+        cmake --build build_64_release --config Release --target install
+        
+    - name: Archive
+      run: |
+        cp ./ext/libwebp2/LICENSE ./LICENSE_libwebp2
+        mv ./LICENSE LICENSE_ifswp2cm
+        zip ifswp2cm -j ./build_32_release/ifswp2cm.spi ./build_64_release/ifswp2cm.sph ./LICENSE*
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./ifswp2cm.zip
+        asset_name: ifswp2cm.zip
+        asset_content_type: application/zip
