@@ -1,17 +1,18 @@
 # Copyright (c) 2023 sincos2854
 # Licensed under the MIT License
 
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.15)
 
 project(ifswp2cm LANGUAGES CXX VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 
-# Don't prefix file names with "lib"
-set(CMAKE_SHARED_LIBRARY_PREFIX "")
+set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use /MT option instead of /MD option.")
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Make libwebp2 a static build")
 set(WP2_BUILD_TESTS OFF CACHE BOOL "No testing required")
 set(WP2_ENABLE_TESTS OFF CACHE BOOL "No testing required")
+set(WP2_BUILD_EXAMPLES OFF CACHE BOOL "EXE files are not necessary.")
+set(WP2_BUILD_EXTRAS OFF CACHE BOOL "")
 
 set(DLL_NAME "ifswp2cm")
 
@@ -29,9 +30,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
   )
 endif()
 
+# Add libwebp2 directory
 add_subdirectory(${LIBWEBP2_SRC_DIR})
 
-# ifswp2cm
+# Creating ifswp2cm
 add_library(${DLL_NAME} SHARED ifswp2cm.cpp spi.def)
 target_include_directories(${DLL_NAME} PRIVATE ${LIBWEBP2_SRC_DIR}/src)
 target_link_libraries(${DLL_NAME} webp2)
