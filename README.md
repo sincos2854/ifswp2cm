@@ -44,6 +44,6 @@ cmake --build build_64_release --config Release --target install
 ```
 ## Inspired by
 - [TORO's Software library(Win32/Win64 Plugin)](http://toro.d.dooo.jp/slplugin.html)
-- [JPEG XL plugin for Susie Image Viewer](https://github.com/uyjulian/ifjxl)
-- [HEIF/AVIF Susie plugin](https://github.com/Mr-Ojii/ifheif)
+- [uyjulian/ifjxl: JPEG XL plugin for Susie Image Viewer](https://github.com/uyjulian/ifjxl)
+- [Mr-Ojii/ifheif: HEIF/AVIF Susie plugin](https://github.com/Mr-Ojii/ifheif)
 - [BPGファイル用Susieプラグインを埋め込みプロファイル対応にする : やんま まのblog（仮）](http://blog.livedoor.jp/yamma_ma/archives/44473876.html)
