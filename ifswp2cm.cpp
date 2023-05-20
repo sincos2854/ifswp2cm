@@ -54,8 +54,8 @@ bool IsSupportedEx(LPCWSTR filename, const LPBYTE data)
     size_t len = wcslen(filename);
     if ( 4 < len &&
         filename[len - 4] == L'.' &&
-        filename[len - 3] == L'w' &&
-        filename[len - 2] == L'p' &&
+        towlower(filename[len - 3]) == L'w' &&
+        towlower(filename[len - 2]) == L'p' &&
         filename[len - 1] == L'2')
     {
         return true;
