@@ -2,6 +2,8 @@
 // Licensed under the MIT License
 
 #include <memory>
+#include "wp2/decode.h"
+#include "spi00in.h"
 #include "ifswp2cm.h"
 
 EXTERN_C int __stdcall GetPluginInfo(int infono, LPSTR buf, int buflen)

@@ -3,8 +3,11 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-project(ifswp2cm LANGUAGES CXX VERSION 0.1.0)
+project(ifswp2cm LANGUAGES CXX VERSION 0.1.1)
 set(CMAKE_CXX_STANDARD 20)
+
+# Write ifswp2cm version number in config.h
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use /MT option instead of /MD option.")
@@ -13,8 +16,6 @@ set(WP2_BUILD_TESTS OFF CACHE BOOL "No testing required")
 set(WP2_ENABLE_TESTS OFF CACHE BOOL "No testing required")
 set(WP2_BUILD_EXAMPLES OFF CACHE BOOL "EXE files are not necessary.")
 set(WP2_BUILD_EXTRAS OFF CACHE BOOL "")
-
-set(DLL_NAME "ifswp2cm")
 
 set(LIBWEBP2_NAME "libwebp2")
 set(LIBWEBP2_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/${LIBWEBP2_NAME})
@@ -32,6 +33,8 @@ endif()
 
 # Add libwebp2 directory
 add_subdirectory(${LIBWEBP2_SRC_DIR})
+
+set(DLL_NAME "ifswp2cm")
 
 # Creating ifswp2cm
 add_library(${DLL_NAME} SHARED ifswp2cm.cpp spi.def)
@@ -64,4 +67,3 @@ elseif(MSVC)
 endif()
 
 install(TARGETS ${DLL_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
-

@@ -1,6 +1,8 @@
 // Copyright (c) 2023 sincos2854
 // Licensed under the MIT License
 
+#pragma once
+
 #include <windows.h>
 
 #define SPI_NO_FUNCTION         -1    // Unimplemented function

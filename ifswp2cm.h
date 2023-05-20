@@ -4,10 +4,9 @@
 #pragma once
 
 #include <string>
-#include "wp2/decode.h"
-#include "spi00in.h"
+#include "config.h"
 
-#define COPYRIGHT L"WebP 2 Susie Plug-in Ver. 0.1.0 (c) 2023 sincos2854"
+#define COPYRIGHT L"WebP 2 Susie Plug-in Ver." PROJECT_VERSION L" (c) 2023 sincos2854"
 
 static const wchar_t* plugin_info[4] = {
     L"00IN",
