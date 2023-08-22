@@ -61,9 +61,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   endif()
 elseif(MSVC)
   # Options for building with Visual Studio
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_options(${DLL_NAME} PRIVATE /W3)
-  endif()
+  target_compile_options(${DLL_NAME} PRIVATE /W3)
 endif()
 
 install(TARGETS ${DLL_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
