@@ -54,7 +54,7 @@ target_compile_definitions(${DLL_NAME} PRIVATE _USRDLL UNICODE _UNICODE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   # Options for cross-compiling
-  target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra)
+  target_compile_options(${DLL_NAME} PRIVATE -Wall)
   target_link_options(${DLL_NAME} PRIVATE -static -static-libstdc++)
   if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_options(${DLL_NAME} PRIVATE -s)
