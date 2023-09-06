@@ -31,33 +31,18 @@ jobs:
         cmake --build build_32_release --config Release --target install
         cmake -G Ninja -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
         cmake --build build_64_release --config Release --target install
-        
+ 
     - name: Archive
       run: |
         cp ./ext/libwebp2/LICENSE ./LICENSE_libwebp2
         mv ./LICENSE LICENSE_ifswp2cm
         zip ifswp2cm -j ./build_32_release/ifswp2cm.spi ./build_64_release/ifswp2cm.sph ./LICENSE*
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        name: Release ${{ github.ref_name }}
         body: |
-          Release notes
-        draft: false
-        prerelease: false
-        
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./ifswp2cm.zip
-        asset_name: ifswp2cm.zip
-        asset_content_type: application/zip
+          ## Release notes
+        files: ifswp2cm.zip
