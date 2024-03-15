@@ -46,7 +46,7 @@ jobs:
         zip ifswp2cm -j ./build_32_release/ifswp2cm.spi ./build_64_release/ifswp2cm.sph ./LICENSE*
 
     - name: Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
         name: Release ${{ github.ref_name }}
