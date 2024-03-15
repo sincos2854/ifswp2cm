@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1
+      uses: jwlawson/actions-setup-cmake@v2
 
     - name: Check cmake version
       run: cmake --version
