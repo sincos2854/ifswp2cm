@@ -55,7 +55,7 @@ int GetPictureInfoEx(LPCWSTR file_name, const LPBYTE data, size_t size, PictureI
     return SPI_ALL_RIGHT;
 }
 
-int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData)
+int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     if (!IsSupportedEx(file_name, data))
     {

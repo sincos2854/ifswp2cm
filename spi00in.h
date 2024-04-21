@@ -30,14 +30,14 @@ struct PictureInfo {
 };
 #pragma pack(pop)
 
-typedef int(CALLBACK* SPI_PROGRESS)(int, int, intptr_t);
+typedef int(CALLBACK* ProgressCallback)(int, int, LONG_PTR);
 EXTERN_C int __stdcall GetPluginInfo(int infono, LPSTR buf, int buflen);
 EXTERN_C int __stdcall GetPluginInfoW(int infono, LPWSTR buf, int buflen);
 EXTERN_C int __stdcall IsSupported(LPCSTR filename, DWORD_PTR dw);
 EXTERN_C int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw);
 EXTERN_C int __stdcall GetPictureInfo(LPCSTR buf, LONG_PTR len, unsigned int flag, PictureInfo* lpInfo);
 EXTERN_C int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, unsigned int flag, PictureInfo* lpInfo);
-EXTERN_C int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);

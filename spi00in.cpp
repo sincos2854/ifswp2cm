@@ -224,7 +224,7 @@ int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, unsigned int flag, Pict
     return GetPictureInfoEx(NULL, reinterpret_cast<LPBYTE>(const_cast<LPWSTR>(buf)), len, lpInfo);
 }
 
-int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     std::wstring unicode;
     if ((flag & 7) == 0)
@@ -234,7 +234,7 @@ int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pH
     return GetPictureW(unicode.c_str(), len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     if (!pHBInfo || !pHBm)
     {
@@ -258,12 +258,12 @@ int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* 
     return GetPictureEx(NULL, reinterpret_cast<LPBYTE>(const_cast<LPWSTR>(buf)), len, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     return GetPicture(buf, len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, SPI_PROGRESS lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, unsigned int flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     return GetPictureW(buf, len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
