@@ -90,49 +90,6 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
     DWORD stride = width * 4;
     size_t bitmap_size = static_cast<size_t>(height) * stride;
 
-    // The number of logical processors in the current group.
-    SYSTEM_INFO info{};
-    GetSystemInfo(&info);
-
-    config.thread_level = info.dwNumberOfProcessors - 1;
-    config.exact = true;
-
-    h_bitmap = std::unique_ptr<HANDLE, PictureHandleDeleter>(
-        LocalAlloc(LMEM_MOVEABLE, bitmap_size), PictureHandleDeleter()
-    );
-    if (!h_bitmap)
-    {
-        return SPI_NO_MEMORY;
-    }
-    bitmap = reinterpret_cast<LPBYTE>(LocalLock(h_bitmap.get()));
-    if(!bitmap)
-    {
-        return SPI_MEMORY_ERROR;
-    }
-
-    if (output_buffer.SetFormat(WP2_BGRA_32) != WP2_STATUS_OK)
-    {
-        return SPI_OTHER_ERROR;
-    }
-    if (output_buffer.SetExternal(width, height, bitmap, stride) != WP2_STATUS_OK)
-    {
-        return SPI_OTHER_ERROR;
-    }
-    if (WP2::Decode(data, size, &output_buffer, config) != WP2_STATUS_OK)
-    {
-        return SPI_OUT_OF_ORDER;
-    }
-
-    // Flip the bitmap
-    size_t half_height = static_cast<size_t>(height) / 2;
-    auto line = std::make_unique<BYTE[]>(stride);
-    for (size_t i = 0; i < half_height; i++)
-    {
-        memcpy(line.get(), bitmap + stride * i, stride);
-        memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
-        memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
-    }
-
     // Get the ICC Profile
     bool got_icc_profile = false;
     if (features.has_icc)
@@ -192,6 +149,49 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
     bitmap_header->biPlanes = 1;
     bitmap_header->biBitCount = 32;
     bitmap_header->biSizeImage = static_cast<DWORD>(bitmap_size);
+
+    // The number of logical processors in the current group.
+    SYSTEM_INFO info{};
+    GetSystemInfo(&info);
+
+    config.thread_level = info.dwNumberOfProcessors - 1;
+    config.exact = true;
+
+    h_bitmap = std::unique_ptr<HANDLE, PictureHandleDeleter>(
+        LocalAlloc(LMEM_MOVEABLE, bitmap_size), PictureHandleDeleter()
+    );
+    if (!h_bitmap)
+    {
+        return SPI_NO_MEMORY;
+    }
+    bitmap = reinterpret_cast<LPBYTE>(LocalLock(h_bitmap.get()));
+    if(!bitmap)
+    {
+        return SPI_MEMORY_ERROR;
+    }
+
+    if (output_buffer.SetFormat(WP2_BGRA_32) != WP2_STATUS_OK)
+    {
+        return SPI_OTHER_ERROR;
+    }
+    if (output_buffer.SetExternal(width, height, bitmap, stride) != WP2_STATUS_OK)
+    {
+        return SPI_OTHER_ERROR;
+    }
+    if (WP2::Decode(data, size, &output_buffer, config) != WP2_STATUS_OK)
+    {
+        return SPI_OUT_OF_ORDER;
+    }
+
+    // Flip the bitmap
+    size_t half_height = static_cast<size_t>(height) / 2;
+    auto line = std::make_unique<BYTE[]>(stride);
+    for (size_t i = 0; i < half_height; i++)
+    {
+        memcpy(line.get(), bitmap + stride * i, stride);
+        memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
+        memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
+    }
 
     LocalUnlock(h_bitmap.get());
     LocalUnlock(h_bitmap_info.get());
