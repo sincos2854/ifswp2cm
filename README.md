@@ -27,7 +27,7 @@ cmake --build build_64_release --config Release --target install
 ```
 Cross-compilation environment
 ```
-sudo apt install cmake pkg-config ninja-build mingw-w64
+sudo apt install cmake ninja-build mingw-w64
 sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
 sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
