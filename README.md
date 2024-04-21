@@ -7,6 +7,7 @@ From [Releases page](https://github.com/sincos2854/ifswp2cm/releases)
 ## Features
 - 32bit(.spi) and 64bit(.sph)
 - ANSI and Unicode (e.g. GetPicture and GetPictureW)
+- Always returns a 32bit BGRA bitmap
 - ICC Profile (Need a viewer that supports color management like [susico](http://www.vector.co.jp/soft/dl/winnt/art/se515212.html))
 
 ## Build
@@ -14,12 +15,12 @@ Get tht source code
 ```
 git clone https://github.com/sincos2854/ifswp2cm.git --recursive --shallow-submodules
 ```
-Visual Studio 32bit
+Visual Studio 32bit (.spi)
 ```
 cmake -G "Visual Studio 17 2022" -A Win32 -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_32_release --config Release --target install
 ```
-Visual Studio 64bit
+Visual Studio 64bit (.sph)
 ```
 cmake -G "Visual Studio 17 2022" -A x64 -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_64_release --config Release --target install
@@ -32,12 +33,12 @@ sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw3
 sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
 sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
 ```
-Cross-compilation 32bit
+Cross-compilation 32bit (.spi)
 ```
 cmake -G Ninja -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++
 cmake --build build_32_release --config Release --target install
 ```
-Cross-compilation 64bit
+Cross-compilation 64bit (.sph)
 ```
 cmake -G Ninja -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
 cmake --build build_64_release --config Release --target install

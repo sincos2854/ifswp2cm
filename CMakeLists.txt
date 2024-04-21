@@ -7,7 +7,7 @@ project(ifswp2cm LANGUAGES CXX VERSION 0.1.5)
 set(CMAKE_CXX_STANDARD 20)
 
 # Write ifswp2cm version number in config.h
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use /MT option instead of /MD option.")
@@ -37,7 +37,7 @@ add_subdirectory(${LIBWEBP2_SRC_DIR})
 set(DLL_NAME "ifswp2cm")
 
 # Creating ifswp2cm
-add_library(${DLL_NAME} SHARED ifswp2cm.cpp spi.def)
+add_library(${DLL_NAME} SHARED spi00in.cpp ifswp2cm.cpp spi00in.def)
 target_include_directories(${DLL_NAME} PRIVATE ${LIBWEBP2_SRC_DIR}/src)
 target_link_libraries(${DLL_NAME} webp2)
 
@@ -54,14 +54,16 @@ target_compile_definitions(${DLL_NAME} PRIVATE _USRDLL UNICODE _UNICODE)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   # Options for cross-compiling
-  target_compile_options(${DLL_NAME} PRIVATE -Wall)
+  target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra)
   target_link_options(${DLL_NAME} PRIVATE -static -static-libstdc++)
   if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_options(${DLL_NAME} PRIVATE -s)
   endif()
 elseif(MSVC)
   # Options for building with Visual Studio
-  target_compile_options(${DLL_NAME} PRIVATE /W3)
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(${DLL_NAME} PRIVATE /W3)
+  endif()
 endif()
 
 install(TARGETS ${DLL_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})

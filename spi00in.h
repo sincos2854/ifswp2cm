@@ -1,4 +1,4 @@
-// Copyright (c) 2023 sincos2854
+// Copyright (c) 2003 - 2024 sincos2854
 // Licensed under the MIT License
 
 #pragma once
@@ -19,7 +19,7 @@
 #define SPI_END_OF_FILE         10    // End of file (Non-public error code)
 
 #pragma pack(push, 1)
-typedef struct PictureInfo {
+struct PictureInfo {
     long left, top;
     long width;
     long height;
@@ -27,7 +27,7 @@ typedef struct PictureInfo {
     WORD y_density;
     short colorDepth;
     HLOCAL hInfo;
-} PictureInfo;
+};
 #pragma pack(pop)
 
 typedef int(CALLBACK* SPI_PROGRESS)(int, int, intptr_t);
