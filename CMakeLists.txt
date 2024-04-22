@@ -1,4 +1,4 @@
-# Copyright (c) 2023 sincos2854
+# Copyright (c) 2023 - 2024 sincos2854
 # Licensed under the MIT License
 
 cmake_minimum_required(VERSION 3.22)
@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.22)
 project(ifswp2cm LANGUAGES CXX VERSION 0.1.6)
 set(CMAKE_CXX_STANDARD 20)
 
-# Write ifswp2cm version number in config.h
+# Write ifswp2cm version number in version.h
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
