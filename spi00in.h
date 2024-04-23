@@ -27,7 +27,7 @@ struct PictureInfo {
     WORD y_density;
     short colorDepth;
 #ifdef _WIN64
-    BYTE alignment[2];
+    char dummy[2];
 #endif
     HLOCAL hInfo;
 };
