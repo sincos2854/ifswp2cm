@@ -2,9 +2,8 @@ name: Build ifswp2cm
 
 on:
   workflow_dispatch:
-  push:
-    # branches: [ "main" ]
-    tags: ["v*"]
+  #push:
+  #  tags: ["v*"]
 
 jobs:
   build:

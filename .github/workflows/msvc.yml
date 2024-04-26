@@ -1,0 +1,116 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: MSVC
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+env:
+  PROJECT_NAME: ifswp2cm
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: ["x86", "x64"]
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Set Variables
+      run: |
+        if ("${{matrix.arch}}" -eq "x86")
+        {
+          echo "MSVC_ARCH=Win32" >> $env:GITHUB_ENV
+          echo "SPI_EXT=spi" >> $env:GITHUB_ENV
+        }
+        else
+        {
+          echo "MSVC_ARCH=x64" >> $env:GITHUB_ENV
+          echo "SPI_EXT=sph" >> $env:GITHUB_ENV
+        }
+
+    - name: Show Variables
+      run: |
+        echo "env env.MSVC_ARCH ${{env.MSVC_ARCH}}"
+        echo "env env.SPI_EXT ${{env.SPI_EXT}}"
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+
+    - name: Check cmake version
+      run: cmake --version
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build spi
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        cmake -G "Visual Studio 17 2022" -A ${{env.MSVC_ARCH}} `
+        -B build_${{env.MSVC_ARCH}}_release `
+        -DCMAKE_INSTALL_PREFIX=out_${{env.MSVC_ARCH}}_release `
+        -DCMAKE_BUILD_TYPE=Release
+
+        cmake --build build_${{env.MSVC_ARCH}}_release --config Release --target install
+
+    - name: Create a zip file
+      run: |
+        New-Item ".\${{env.PROJECT_NAME}}\" -ItemType Director
+        Copy-Item -Path ".\out_${{env.MSVC_ARCH}}_release\${{env.PROJECT_NAME}}.${{env.SPI_EXT}}" -Destination ".\${{env.PROJECT_NAME}}\"
+
+        if("${{matrix.arch}}" -eq "x64")
+        {
+          Copy-Item -Path ".\ext\libwebp2\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE_libwebp2"
+          Copy-Item -Path ".\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE_${{env.PROJECT_NAME}}"
+        }
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.arch}}
+        path: .\${{env.PROJECT_NAME}}\
+        retention-days: 1
+        overwrite: true
+
+  Release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ${{env.PROJECT_NAME}}
+        merge-multiple: true
+
+    - name: Create a zip
+      run: |
+        ls -l ./${{env.PROJECT_NAME}}/
+        zip -j ${{env.PROJECT_NAME}} ./${{env.PROJECT_NAME}}/*
+        ls -l
+        zipinfo ./${{env.PROJECT_NAME}}.zip
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: Release ${{github.ref_name}}
+        body: |
+          ## Release notes
+        files: ${{env.PROJECT_NAME}}.zip
+  
