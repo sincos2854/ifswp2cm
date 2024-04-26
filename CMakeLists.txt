@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-project(ifswp2cm LANGUAGES CXX VERSION 0.1.9)
+project(ifswp2cm LANGUAGES CXX VERSION 0.1.8)
 set(CMAKE_CXX_STANDARD 20)
 
 # Write ifswp2cm version number in version.h
@@ -11,10 +11,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_D
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use /MT option instead of /MD option.")
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Make libwebp2 a static build")
-set(WP2_BUILD_TESTS OFF CACHE BOOL "No testing required")
-set(WP2_ENABLE_TESTS OFF CACHE BOOL "No testing required")
-set(WP2_BUILD_EXAMPLES OFF CACHE BOOL "EXE files are not necessary.")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Make libwebp2 a static build.")
+set(WP2_BUILD_TESTS OFF CACHE BOOL "")
+set(WP2_ENABLE_TESTS OFF CACHE BOOL "")
+set(WP2_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(WP2_BUILD_EXTRAS OFF CACHE BOOL "")
 
 set(LIBWEBP2_NAME "libwebp2")
@@ -24,7 +24,7 @@ message(STATUS "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR = ${LIBWEBP2_SRC_DIR}")
 
 # Since Linux can't read "Windows.h", replace it with "windows.h".
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
   message(STATUS "Replacing Windows.h with windows.h")
   execute_process(
     COMMAND find ${LIBWEBP2_SRC_DIR} -name "*.h" -type f -exec sed -i "s/Windows\.h/windows.h/g" {} +
@@ -52,17 +52,18 @@ endif()
 
 target_compile_definitions(${DLL_NAME} PRIVATE _USRDLL UNICODE _UNICODE)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  # Options for cross-compiling
+if(MSVC)
+  target_compile_options(${DLL_NAME} PRIVATE /W3)
+else()
   target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra)
-  target_link_options(${DLL_NAME} PRIVATE -static -static-libstdc++)
   if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_options(${DLL_NAME} PRIVATE -s)
   endif()
-elseif(MSVC)
-  # Options for building with Visual Studio
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_options(${DLL_NAME} PRIVATE /W3)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_options(${DLL_NAME} PRIVATE -static)
+  endif()
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_link_options(${DLL_NAME} PRIVATE -static-libstdc++)
   endif()
 endif()
 
