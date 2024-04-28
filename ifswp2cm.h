@@ -8,14 +8,23 @@
 
 #define COPYRIGHT L"WebP 2 Susie Plug-in Ver." PROJECT_VERSION L" (c) 2003 - 2024 sincos2854"
 
-static const wchar_t* plugin_info[4] = {
+#define EXTENSION1 L".wp2"
+
+#define PLUGIN_INFO3 L"*" EXTENSION1
+#define PLOGIN_INFO4 L"WebP 2 file(*" EXTENSION1 L")"
+
+static const wchar_t* plugin_info[] = {
     L"00IN",
     COPYRIGHT,
-    L"*.wp2",
-    L"WebP 2 file(*.wp2)",
+    PLUGIN_INFO3,
+    PLOGIN_INFO4,
 };
 
 #define HEADER_MIN_SIZE 3
+
+constexpr static std::wstring_view extensions[]{
+    EXTENSION1
+};
 
 bool IsSupportedEx(LPCWSTR filename, const LPBYTE data);
 int GetPictureInfoEx(LPCWSTR file_name, const LPBYTE data, size_t size, PictureInfo* lpInfo);

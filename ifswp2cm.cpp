@@ -14,6 +14,7 @@ bool IsSupportedEx(LPCWSTR filename, const LPBYTE data)
         return false;
     }
 
+    // Check the file header
     if (memcmp(data, "\xF4\xFF\x6F", 3) == 0)
     {
         return true;
@@ -24,10 +25,16 @@ bool IsSupportedEx(LPCWSTR filename, const LPBYTE data)
         return false;
     }
 
-    size_t len = wcslen(filename);
-    if (4 <= len && !_wcsicmp(filename + len - 4, L".wp2"))
+    std::wstring_view name = filename;
+
+    // Check the file extension
+    for (const std::wstring_view& ext : extensions)
     {
-        return true;
+        auto dot = name.find_last_of(L'.');
+        if (dot != std::wstring_view::npos && _wcsicmp(name.data() + dot, ext.data()) == 0)
+        {
+            return true;
+        }
     }
 
     return false;
