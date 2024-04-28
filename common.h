@@ -1,6 +1,8 @@
 // Copyright (c) 2003 - 2024 sincos2854
 // Licensed under the MIT License
 
+#pragma once
+
 #include <windows.h>
 
 struct FileHandleDeleter
