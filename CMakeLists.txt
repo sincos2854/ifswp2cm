@@ -20,12 +20,12 @@ set(WP2_BUILD_EXTRAS OFF CACHE BOOL "")
 set(LIBWEBP2_NAME "libwebp2")
 set(LIBWEBP2_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/${LIBWEBP2_NAME})
 
-message(STATUS "CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CMAKE_HOST_SYSTEM_NAME = ${CMAKE_HOST_SYSTEM_NAME}")
 message(STATUS "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR = ${LIBWEBP2_SRC_DIR}")
 
 # Since Linux can't read "Windows.h", replace it with "windows.h".
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Windows" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   message(STATUS "Replacing Windows.h with windows.h")
   execute_process(
     COMMAND find ${LIBWEBP2_SRC_DIR} -name "*.h" -type f -exec sed -i "s/Windows\.h/windows.h/g" {} +
