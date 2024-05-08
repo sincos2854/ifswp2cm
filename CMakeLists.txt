@@ -1,7 +1,7 @@
 # Copyright (c) 2023 - 2024 sincos2854
 # Licensed under the MIT License
 
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.22...3.29)
 
 project(ifswp2cm LANGUAGES CXX VERSION 0.1.10)
 set(CMAKE_CXX_STANDARD 20)
@@ -25,7 +25,7 @@ message(STATUS "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR = ${LIBWEBP2_SRC_DIR}")
 
 # Since Linux can't read "Windows.h", replace it with "windows.h".
-if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Windows" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(UNIX)
   message(STATUS "Replacing Windows.h with windows.h")
   execute_process(
     COMMAND find ${LIBWEBP2_SRC_DIR} -name "*.h" -type f -exec sed -i "s/Windows\.h/windows.h/g" {} +
