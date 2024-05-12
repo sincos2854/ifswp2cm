@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <string>
 #include "spi00in.h"
 #include "version.h"
 
@@ -13,7 +14,7 @@
 #define PLUGIN_INFO3 L"*" EXTENSION1
 #define PLOGIN_INFO4 L"WebP 2 file(*" EXTENSION1 L")"
 
-static const wchar_t* plugin_info[] = {
+static const wchar_t* plugin_info[]{
     L"00IN",
     COPYRIGHT,
     PLUGIN_INFO3,

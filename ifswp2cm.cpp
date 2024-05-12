@@ -2,7 +2,6 @@
 // Licensed under the MIT License
 
 #include <memory>
-#include <string>
 #include "common.h"
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
