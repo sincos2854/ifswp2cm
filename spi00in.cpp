@@ -98,7 +98,7 @@ int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<
         return SPI_FILE_READ_ERROR;
     }
 
-    file_data = std::make_unique<BYTE[]>(file_size);
+    file_data = std::make_unique_for_overwrite<BYTE[]>(file_size);
 
     size_t remain = file_size, offset = 0;
     DWORD to_read = 0, read = 0;
@@ -166,7 +166,7 @@ int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
 
     if ((dw & 0xFFFF0000) == 0)
     {
-        buf = std::make_unique<BYTE[]>(BUF_SIZE_HEADER);
+        buf = std::make_unique_for_overwrite<BYTE[]>(BUF_SIZE_HEADER);
         if (!ReadFile(reinterpret_cast<HANDLE>(dw), buf.get(), BUF_SIZE_HEADER, &read_size, NULL))
         {
             return 0;
