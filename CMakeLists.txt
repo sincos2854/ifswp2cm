@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.22...3.29)
 
-project(ifswp2cm LANGUAGES CXX VERSION 0.1.12)
+project(ifswp2cm LANGUAGES CXX VERSION 0.1.13)
 set(CMAKE_CXX_STANDARD 20)
 
 # Write ifswp2cm version number in version.h
