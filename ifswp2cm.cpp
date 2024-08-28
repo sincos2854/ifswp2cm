@@ -161,7 +161,6 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
     GetSystemInfo(&info);
 
     config.thread_level = info.dwNumberOfProcessors - 1;
-    config.exact = true;
 
     h_bitmap = std::unique_ptr<HANDLE, PictureHandleDeleter>(
         LocalAlloc(LMEM_MOVEABLE, bitmap_size), PictureHandleDeleter()
