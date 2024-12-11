@@ -1,10 +1,10 @@
 # ifswp2cm
 
-Susie Plug-in for [WebP 2](https://chromium.googlesource.com/codecs/libwebp2/)(*.wp2) files.
+Susie Plug-in for [WebP 2](https://chromium.googlesource.com/codecs/libwebp2/)(*.wp2) file.
 
 ## Download
 
-From [Releases page](https://github.com/sincos2854/ifswp2cm/releases)
+From Releases page
 
 ## Features
 
