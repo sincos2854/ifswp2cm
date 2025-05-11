@@ -7,7 +7,7 @@
 #include "spi00in.h"
 #include "version.h"
 
-#define COPYRIGHT L"WebP 2 Susie Plug-in Ver." PROJECT_VERSION L" (c) 2003 - 2024 sincos2854"
+#define COPYRIGHT L"WebP 2 Susie Plug-in Ver." PROJECT_VERSION L" (c) 2003 - 2025 sincos2854"
 
 #define EXTENSION1 L".wp2"
 
