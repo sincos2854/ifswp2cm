@@ -66,8 +66,8 @@ int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
 
 int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<BYTE[]>& file_data, size_t& file_size)
 {
-    auto handle = std::unique_ptr<HANDLE, FileHandleDeleter>(
-        CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL), FileHandleDeleter()
+    auto handle = FileHandle(
+        CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL)
     );
     if (handle.get() == INVALID_HANDLE_VALUE)
     {

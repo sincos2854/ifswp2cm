@@ -78,8 +78,8 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
         }
     }
 
-    std::unique_ptr<HANDLE, PictureHandleDeleter> h_bitmap_info;
-    std::unique_ptr<HANDLE, PictureHandleDeleter> h_bitmap;
+    PictureHandle h_bitmap_info;
+    PictureHandle h_bitmap;
     LPBITMAPINFOHEADER bitmap_header = nullptr;
     LPBYTE bitmap = nullptr;
 
@@ -107,8 +107,8 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
             return SPI_OUT_OF_ORDER;
         }
 
-        h_bitmap_info = std::unique_ptr<HANDLE, PictureHandleDeleter>(
-            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_), PictureHandleDeleter()
+        h_bitmap_info = PictureHandle(
+            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_)
         );
         if (!h_bitmap_info)
         {
@@ -133,8 +133,8 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
 
     if (!got_icc_profile)
     {
-        h_bitmap_info = std::unique_ptr<HANDLE, PictureHandleDeleter>(
-            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)), PictureHandleDeleter()
+        h_bitmap_info = PictureHandle(
+            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO))
         );
         if (!h_bitmap_info)
         {
@@ -164,8 +164,8 @@ int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBI
 
     config.thread_level = info.dwNumberOfProcessors - 1;
 
-    h_bitmap = std::unique_ptr<HANDLE, PictureHandleDeleter>(
-        LocalAlloc(LMEM_MOVEABLE, bitmap_size), PictureHandleDeleter()
+    h_bitmap = PictureHandle(
+        LocalAlloc(LMEM_MOVEABLE, bitmap_size)
     );
     if (!h_bitmap)
     {
