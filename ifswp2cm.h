@@ -21,7 +21,7 @@ static const wchar_t* plugin_info[]{
     PLOGIN_INFO4,
 };
 
-#define HEADER_MIN_SIZE 3
+constexpr size_t HEADER_MIN_SIZE = 3;
 
 constexpr static std::wstring_view extensions[]{
     EXTENSION1

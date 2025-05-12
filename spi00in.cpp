@@ -5,7 +5,7 @@
 #include "common.h"
 #include "ifswp2cm.h"
 
-#define BUF_SIZE_HEADER 2048
+constexpr size_t BUF_SIZE_HEADER = 2048;
 
 int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
 {
