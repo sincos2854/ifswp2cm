@@ -163,7 +163,7 @@ int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
     LPBYTE data = nullptr;
     DWORD read_size = 0;
 
-    if ((dw & static_cast<DWORD_PTR>(-1) - 0xFFFF) == 0)
+    if ((dw & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
     {
         buf = std::make_unique_for_overwrite<BYTE[]>(BUF_SIZE_HEADER);
         if (!ReadFile(reinterpret_cast<HANDLE>(dw), buf.get(), BUF_SIZE_HEADER, &read_size, NULL))
