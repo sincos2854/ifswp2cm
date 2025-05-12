@@ -1,7 +1,6 @@
 // Copyright (c) 2003 - 2025 sincos2854
 // Licensed under the MIT License
 
-#include <memory>
 #include <string>
 #include "common.h"
 #include "ifswp2cm.h"

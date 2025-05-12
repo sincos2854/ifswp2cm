@@ -3,6 +3,8 @@
 
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 
 #define SPI_NO_FUNCTION         -1    // Unimplemented function
