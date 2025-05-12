@@ -7,7 +7,7 @@
 
 constexpr size_t BUF_SIZE_HEADER = 2048;
 
-int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
+static int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
 {
     if (!unicode || !unicode[0])
     {
@@ -37,7 +37,7 @@ int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
     return static_cast<int>(strlen(ansi));
 }
 
-int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
+static int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
 {
     unicode.clear();
 
@@ -63,7 +63,7 @@ int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
     return static_cast<int>(unicode.size());
 }
 
-int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<BYTE[]>& file_data, size_t& file_size)
+static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<BYTE[]>& file_data, size_t& file_size)
 {
     auto handle = FileHandle(
         CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL)
