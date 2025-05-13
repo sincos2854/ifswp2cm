@@ -7,7 +7,7 @@
 #define NOMINMAX
 #include <windows.h>
 
-constexpr int SPI_NO_FUNCTION       = -1;   // Unimplemented function;
+constexpr int SPI_NO_FUNCTION       = -1;   // Unimplemented function
 constexpr int SPI_ALL_RIGHT         =  0;   // Ended without error
 constexpr int SPI_ABORT             =  1;   // Callback function returned non-zero, so expansion was aborted
 constexpr int SPI_NOT_SUPPORT       =  2;   // Unsupported format
