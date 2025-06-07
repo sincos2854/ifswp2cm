@@ -27,6 +27,6 @@ constexpr static std::wstring_view extensions[]{
     EXTENSION1
 };
 
-bool IsSupportedEx(LPCWSTR filename, const LPBYTE data);
-int GetPictureInfoEx(LPCWSTR file_name, const LPBYTE data, size_t size, PictureInfo* lpInfo);
-int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+bool IsSupportedEx(LPCWSTR filename, const BYTE* data);
+int GetPictureInfoEx(LPCWSTR file_name, const BYTE* data, size_t size, PictureInfo* lpInfo);
+int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);

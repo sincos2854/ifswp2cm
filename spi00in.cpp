@@ -220,7 +220,7 @@ int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, UINT flag, PictureInfo*
         return GetPictureInfoEx(buf, file_data.get(), file_size, lpInfo);
     }
 
-    return GetPictureInfoEx(NULL, reinterpret_cast<LPBYTE>(const_cast<LPWSTR>(buf)), len, lpInfo);
+    return GetPictureInfoEx(NULL, reinterpret_cast<const BYTE*>(buf), len, lpInfo);
 }
 
 int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
@@ -254,7 +254,7 @@ int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo,
         return GetPictureEx(buf, file_data.get(), file_size, pHBInfo, pHBm, lpPrgressCallback, lData);
     }
 
-    return GetPictureEx(NULL, reinterpret_cast<LPBYTE>(const_cast<LPWSTR>(buf)), len, pHBInfo, pHBm, lpPrgressCallback, lData);
+    return GetPictureEx(NULL, reinterpret_cast<const BYTE*>(buf), len, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
 int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)

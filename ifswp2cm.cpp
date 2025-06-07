@@ -5,7 +5,7 @@
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
 
-bool IsSupportedEx(LPCWSTR filename, const LPBYTE data)
+bool IsSupportedEx(LPCWSTR filename, const BYTE* data)
 {
     if (!data)
     {
@@ -40,7 +40,7 @@ bool IsSupportedEx(LPCWSTR filename, const LPBYTE data)
     return false;
 }
 
-int GetPictureInfoEx(LPCWSTR file_name, const LPBYTE data, size_t size, PictureInfo* lpInfo)
+int GetPictureInfoEx(LPCWSTR file_name, const BYTE* data, size_t size, PictureInfo* lpInfo)
 {
     if (!IsSupportedEx(file_name, data))
     {
@@ -62,7 +62,7 @@ int GetPictureInfoEx(LPCWSTR file_name, const LPBYTE data, size_t size, PictureI
     return SPI_ALL_RIGHT;
 }
 
-int GetPictureEx(LPCWSTR file_name, const LPBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     if (!IsSupportedEx(file_name, data))
     {
