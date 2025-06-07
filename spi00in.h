@@ -7,18 +7,18 @@
 #define NOMINMAX
 #include <windows.h>
 
-constexpr int SPI_NO_FUNCTION       = -1;   // Unimplemented function
-constexpr int SPI_ALL_RIGHT         =  0;   // Ended without error
-constexpr int SPI_ABORT             =  1;   // Callback function returned non-zero, so expansion was aborted
-constexpr int SPI_NOT_SUPPORT       =  2;   // Unsupported format
-constexpr int SPI_OUT_OF_ORDER      =  3;   // Broken data
-constexpr int SPI_NO_MEMORY         =  4;   // Memory can't be allocated
-constexpr int SPI_MEMORY_ERROR      =  5;   // Memory error
-constexpr int SPI_FILE_READ_ERROR   =  6;   // Can't read file
-constexpr int SPI_WINDOW_ERROR      =  7;   // Can't open window (Non-public error code)
-constexpr int SPI_OTHER_ERROR       =  8;   // Error of some kind
-constexpr int SPI_FILE_WRITE_ERROR  =  9;   // Can't write file (Non-public error code)
-constexpr int SPI_END_OF_FILE       = 10;   // End of file (Non-public error code)
+constexpr int SPI_NO_FUNCTION      = -1;    // Unimplemented function
+constexpr int SPI_ALL_RIGHT        =  0;    // Ended without error
+constexpr int SPI_ABORT            =  1;    // Callback function returned non-zero, so expansion was aborted
+constexpr int SPI_NOT_SUPPORT      =  2;    // Unsupported format
+constexpr int SPI_OUT_OF_ORDER     =  3;    // Broken data
+constexpr int SPI_NO_MEMORY        =  4;    // Memory can't be allocated
+constexpr int SPI_MEMORY_ERROR     =  5;    // Memory error
+constexpr int SPI_FILE_READ_ERROR  =  6;    // Can't read file
+constexpr int SPI_WINDOW_ERROR     =  7;    // Can't open window (Non-public error code)
+constexpr int SPI_OTHER_ERROR      =  8;    // Error of some kind
+constexpr int SPI_FILE_WRITE_ERROR =  9;    // Can't write file (Non-public error code)
+constexpr int SPI_END_OF_FILE      = 10;    // End of file (Non-public error code)
 
 #pragma pack(push, 1)
 struct PictureInfo {
