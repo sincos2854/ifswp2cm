@@ -160,7 +160,7 @@ int __stdcall IsSupported(LPCSTR filename, DWORD_PTR dw)
 int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
 {
     std::unique_ptr<BYTE[]> buf;
-    LPBYTE data = nullptr;
+    BYTE* data = nullptr;
     DWORD read_size = 0;
 
     if ((dw & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
@@ -178,7 +178,7 @@ int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
     }
     else
     {
-        data = reinterpret_cast<LPBYTE>(dw);
+        data = reinterpret_cast<BYTE*>(dw);
     }
 
     if (IsSupportedEx(filename, data))
