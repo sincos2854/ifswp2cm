@@ -7,18 +7,15 @@
 #include "spi00in.h"
 #include "version.h"
 
-#define COPYRIGHT L"WebP 2 Susie Plug-in Ver." PROJECT_VERSION L" (c) 2003 - 2025 sincos2854"
+constexpr LPCWSTR API_VER = L"00IN";
+constexpr LPCWSTR EXTENSION = L"*.wp2";
+constexpr LPCWSTR FILE_TYPE = L"WebP 2 file(*.wp2)";
 
-#define EXTENSION1 L".wp2"
-
-#define PLUGIN_INFO3 L"*" EXTENSION1
-#define PLOGIN_INFO4 L"WebP 2 file(*" EXTENSION1 L")"
-
-static const wchar_t* plugin_info[]{
-    L"00IN",
-    COPYRIGHT,
-    PLUGIN_INFO3,
-    PLOGIN_INFO4,
+constexpr std::wstring_view PLUGIN_INFO[]{
+    API_VER,
+    PLUGIN_NAME,
+    EXTENSION,
+    FILE_TYPE
 };
 
 constexpr size_t HEADER_MIN_SIZE = 3;

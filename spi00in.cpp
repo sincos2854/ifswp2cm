@@ -134,18 +134,18 @@ int __stdcall GetPluginInfo(int infono, LPSTR buf, int buflen)
 
 int __stdcall GetPluginInfoW(int infono, LPWSTR buf, int buflen)
 {
-    if (buflen <= 1 || infono < 0 || (sizeof(plugin_info) / sizeof(plugin_info[0])) <= static_cast<size_t>(infono))
+    if (buflen <= 1 || infono < 0 || std::size(PLUGIN_INFO) <= static_cast<size_t>(infono))
     {
         return 0;
     }
 
-    auto str = plugin_info[infono];
-    int len = static_cast<int>(wcslen(str)) + 1;
+    auto str = PLUGIN_INFO[infono];
+    int len = static_cast<int>(str.size()) + 1;
     if (buflen < len)
     {
         len = buflen;
     }
-    wcsncpy_s(buf, len, str, _TRUNCATE);
+    wcsncpy_s(buf, len, str.data(), _TRUNCATE);
 
     return static_cast<int>(wcslen(buf));
 }
