@@ -18,25 +18,6 @@ bool IsSupportedEx(LPCWSTR filename, const BYTE* data)
         return true;
     }
 
-#if 0
-    if (!filename || !filename[0])
-    {
-        return false;
-    }
-
-    std::wstring_view name = filename;
-
-    // Check the file extension
-    for (const std::wstring_view& ext : extensions)
-    {
-        auto dot = name.find_last_of(L'.');
-        if (dot != std::wstring_view::npos && _wcsicmp(name.data() + dot, ext.data()) == 0)
-        {
-            return true;
-        }
-    }
-#endif
-
     return false;
 }
 
