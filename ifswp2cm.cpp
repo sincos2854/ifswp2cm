@@ -172,7 +172,7 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
 
     // Flip the bitmap
     size_t half_height = static_cast<size_t>(height) / 2;
-    auto line = std::make_unique<BYTE[]>(stride);
+    auto line = std::make_unique_for_overwrite<BYTE[]>(stride);
     for (size_t i = 0; i < half_height; i++)
     {
         memcpy(line.get(), bitmap + stride * i, stride);
