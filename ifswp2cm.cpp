@@ -60,8 +60,6 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
 
     PictureHandle h_bitmap_info;
     PictureHandle h_bitmap;
-    LPBITMAPINFOHEADER bitmap_header = nullptr;
-    BYTE* bitmap = nullptr;
 
     WP2::BitstreamFeatures features{};
     WP2::DecoderConfig config;
@@ -79,7 +77,6 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     size_t bitmap_size = static_cast<size_t>(height) * stride;
 
     // Get the ICC Profile
-    bool got_icc_profile = false;
     if (features.has_icc)
     {
         if (WP2::GetChunk(data, size, WP2::ChunkType::kIcc, &writer) != WP2_STATUS_OK)
@@ -87,51 +84,53 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
             return SPI_OUT_OF_ORDER;
         }
 
-        h_bitmap_info = PictureHandle(
-            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_)
-        );
+        h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_));
+
         if (!h_bitmap_info)
         {
             return SPI_NO_MEMORY;
         }
 
-        LPBITMAPV5HEADER v5 = reinterpret_cast<LPBITMAPV5HEADER>(LocalLock(h_bitmap_info.get()));
-        if (!v5)
+        auto auto_unlock_header = std::make_unique<AutoUnlockBitmapHeader>(h_bitmap_info.get());
+
+        if (!auto_unlock_header->MakeV5Header())
         {
             return SPI_MEMORY_ERROR;
         }
+
+        auto v5 = auto_unlock_header->GetV5Header();
 
         v5->bV5Size = sizeof(BITMAPV5HEADER);
         v5->bV5CSType = PROFILE_EMBEDDED;
         v5->bV5ProfileData = sizeof(BITMAPV5HEADER);
         v5->bV5ProfileSize = static_cast<DWORD>(writer.size_);
-        std::memcpy(reinterpret_cast<BYTE*>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
-        got_icc_profile = true;
 
-        LocalUnlock(h_bitmap_info.get());
+        std::memcpy(reinterpret_cast<BYTE*>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
     }
 
-    if (!got_icc_profile)
+    if (!h_bitmap_info)
     {
-        h_bitmap_info = PictureHandle(
-            LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO))
-        );
+        h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)));
+
         if (!h_bitmap_info)
         {
             return SPI_NO_MEMORY;
         }
     }
 
-    bitmap_header = reinterpret_cast<LPBITMAPINFOHEADER>(LocalLock(h_bitmap_info.get()));
+    auto auto_unlock_header = std::make_unique<AutoUnlockBitmapHeader>(h_bitmap_info.get());
+    auto bitmap_header = auto_unlock_header->GetBitmapHeader();
+
     if (!bitmap_header)
     {
         return SPI_MEMORY_ERROR;
     }
 
-    if (!got_icc_profile)
+    if (!auto_unlock_header->GetV5Header())
     {
         bitmap_header->biSize = sizeof(BITMAPINFOHEADER);
     }
+
     bitmap_header->biWidth = width;
     bitmap_header->biHeight = height;
     bitmap_header->biPlanes = 1;
@@ -144,14 +143,16 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
 
     config.thread_level = info.dwNumberOfProcessors - 1;
 
-    h_bitmap = PictureHandle(
-        LocalAlloc(LMEM_MOVEABLE, bitmap_size)
-    );
+    h_bitmap = PictureHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
+
     if (!h_bitmap)
     {
         return SPI_NO_MEMORY;
     }
-    bitmap = reinterpret_cast<BYTE*>(LocalLock(h_bitmap.get()));
+    
+    auto auto_unlock_bitmap = std::make_unique<AutoUnlockBitmap>(h_bitmap.get());
+    auto bitmap = auto_unlock_bitmap->GetBitmap();
+
     if(!bitmap)
     {
         return SPI_MEMORY_ERROR;
@@ -161,10 +162,12 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     {
         return SPI_OTHER_ERROR;
     }
+
     if (output_buffer.SetExternal(width, height, bitmap, stride) != WP2_STATUS_OK)
     {
         return SPI_OTHER_ERROR;
     }
+
     if (WP2::Decode(data, size, &output_buffer, config) != WP2_STATUS_OK)
     {
         return SPI_OUT_OF_ORDER;
@@ -188,8 +191,8 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
         }
     }
 
-    LocalUnlock(h_bitmap.get());
-    LocalUnlock(h_bitmap_info.get());
+    auto_unlock_header.reset();
+    auto_unlock_bitmap.reset();
 
     *pHBInfo = h_bitmap_info.get();
     *pHBm = h_bitmap.get();
