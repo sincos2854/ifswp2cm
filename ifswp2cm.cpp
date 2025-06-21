@@ -13,7 +13,7 @@ bool IsSupportedEx(LPCWSTR filename, const BYTE* data)
     }
 
     // Check the file header
-    if (memcmp(data, "\xF4\xFF\x6F", 3) == 0)
+    if (std::memcmp(data, "\xF4\xFF\x6F", 3) == 0)
     {
         return true;
     }
@@ -105,7 +105,7 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
         v5->bV5CSType = PROFILE_EMBEDDED;
         v5->bV5ProfileData = sizeof(BITMAPV5HEADER);
         v5->bV5ProfileSize = static_cast<DWORD>(writer.size_);
-        memcpy(reinterpret_cast<BYTE*>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
+        std::memcpy(reinterpret_cast<BYTE*>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
         got_icc_profile = true;
 
         LocalUnlock(h_bitmap_info.get());
@@ -175,9 +175,9 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     auto line = std::make_unique_for_overwrite<BYTE[]>(stride);
     for (size_t i = 0; i < half_height; i++)
     {
-        memcpy(line.get(), bitmap + stride * i, stride);
-        memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
-        memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
+        std::memcpy(line.get(), bitmap + stride * i, stride);
+        std::memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
+        std::memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
     }
 
     if (lpPrgressCallback)
