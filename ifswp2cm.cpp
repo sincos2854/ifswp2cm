@@ -1,4 +1,4 @@
-// Copyright (c) 2003 - 2025 sincos2854
+// Copyright (c) 2023 - 2025 sincos2854
 // Licensed under the MIT License
 
 #include "common.h"
