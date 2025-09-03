@@ -1,7 +1,7 @@
 # Copyright (c) 2023 - 2025 sincos2854
 # Licensed under the MIT License
 
-cmake_minimum_required(VERSION 3.22...4.0)
+cmake_minimum_required(VERSION 3.22...4.1)
 
 project(ifswp2cm LANGUAGES C CXX VERSION 0.3.9)
 set(CMAKE_CXX_STANDARD 20)
