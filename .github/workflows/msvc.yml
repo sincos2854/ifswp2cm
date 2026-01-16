@@ -1,8 +1,3 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: MSVC
 
 on:
@@ -69,13 +64,13 @@ jobs:
 
     - name: Create a zip file
       run: |
-        New-Item ".\${{env.PROJECT_NAME}}\" -ItemType Director
+        New-Item ".\${{env.PROJECT_NAME}}\LICENSE\" -ItemType Directory -Force
         Copy-Item -Path ".\out_${{env.MSVC_ARCH}}_release\${{env.PROJECT_NAME}}.${{env.SPI_EXT}}" -Destination ".\${{env.PROJECT_NAME}}\"
 
         if("${{matrix.arch}}" -eq "x64")
         {
-          Copy-Item -Path ".\ext\libwebp2\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE_libwebp2"
-          Copy-Item -Path ".\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE_${{env.PROJECT_NAME}}"
+          Copy-Item -Path ".\ext\libwebp2\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE\LICENSE_libwebp2"
+          Copy-Item -Path ".\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE\LICENSE_${{env.PROJECT_NAME}}"
         }
 
     - name: Upload Artifact
@@ -87,7 +82,7 @@ jobs:
         overwrite: true
 
   Release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
 
@@ -98,10 +93,12 @@ jobs:
         path: ${{env.PROJECT_NAME}}
         merge-multiple: true
 
-    - name: Create a zip
+    - name: Create a zip file
       run: |
         ls -l ./${{env.PROJECT_NAME}}/
-        zip -j ${{env.PROJECT_NAME}} ./${{env.PROJECT_NAME}}/*
+        cd ./${{env.PROJECT_NAME}}/
+        zip -r ../${{env.PROJECT_NAME}} ./*
+        cd ../
         ls -l
         zipinfo ./${{env.PROJECT_NAME}}.zip
 
@@ -113,4 +110,3 @@ jobs:
         body: |
           ## Release notes
         files: ${{env.PROJECT_NAME}}.zip
-  
