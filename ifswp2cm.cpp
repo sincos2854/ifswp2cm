@@ -62,9 +62,6 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     PictureHandle h_bitmap;
 
     WP2::BitstreamFeatures features{};
-    WP2::DecoderConfig config;
-    WP2::ArgbBuffer output_buffer;
-    WP2::MemoryWriter writer;
 
     if (features.Read(data, size) != WP2_STATUS_OK)
     {
@@ -79,6 +76,8 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     // Get the ICC Profile
     if (features.has_icc)
     {
+        WP2::MemoryWriter writer;
+
         if (WP2::GetChunk(data, size, WP2::ChunkType::kIcc, &writer) != WP2_STATUS_OK)
         {
             return SPI_OUT_OF_ORDER;
@@ -137,19 +136,14 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     bitmap_header->biBitCount = 32;
     bitmap_header->biSizeImage = static_cast<DWORD>(bitmap_size);
 
-    // The number of logical processors in the current group.
-    SYSTEM_INFO info{};
-    GetSystemInfo(&info);
-
-    config.thread_level = info.dwNumberOfProcessors - 1;
-
+    // Decode the image
     h_bitmap = PictureHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
 
     if (!h_bitmap)
     {
         return SPI_NO_MEMORY;
     }
-    
+
     auto auto_unlock_bitmap = std::make_unique<AutoUnlockBitmap>(h_bitmap.get());
     auto bitmap = auto_unlock_bitmap->GetBitmap();
 
@@ -157,6 +151,8 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     {
         return SPI_MEMORY_ERROR;
     }
+
+    WP2::ArgbBuffer output_buffer;
 
     if (output_buffer.SetFormat(WP2_BGRA_32) != WP2_STATUS_OK)
     {
@@ -167,6 +163,15 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
     {
         return SPI_OTHER_ERROR;
     }
+
+    // The number of logical processors in the current group.
+    SYSTEM_INFO info{};
+
+    GetSystemInfo(&info);
+
+    WP2::DecoderConfig config;
+
+    config.thread_level = info.dwNumberOfProcessors - 1;
 
     if (WP2::Decode(data, size, &output_buffer, config) != WP2_STATUS_OK)
     {
