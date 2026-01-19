@@ -54,7 +54,7 @@ public:
         }
     }
 
-    inline bool MakeV5Header(void)
+    bool MakeV5Header(void)
     {
         if (locked_v5_ != nullptr)
         {
@@ -72,12 +72,12 @@ public:
         return false;
     }
 
-    inline LPBITMAPINFOHEADER GetBitmapHeader(void) const
+    LPBITMAPINFOHEADER GetBitmapHeader(void) const
     {
         return locked_header_;
     }
 
-    inline LPBITMAPV5HEADER GetV5Header(void) const
+    LPBITMAPV5HEADER GetV5Header(void) const
     {
         return locked_v5_;
     }
@@ -107,7 +107,7 @@ public:
         }
     }
 
-    inline BYTE* GetBitmap(void) const
+    BYTE* GetBitmap(void) const
     {
         return locked_bitmap_;
     }
