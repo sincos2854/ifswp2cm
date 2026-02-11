@@ -24,14 +24,14 @@ git clone https://github.com/sincos2854/ifswp2cm.git --recursive --shallow-submo
 Visual Studio 32bit (.spi)
 
 ```bat
-cmake -G "Visual Studio 17 2022" -A Win32 -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release
+cmake -G "Visual Studio 18 2026" -A Win32 -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_32_release --config Release --target install
 ```
 
 Visual Studio 64bit (.sph)
 
 ```bat
-cmake -G "Visual Studio 17 2022" -A x64 -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release
+cmake -G "Visual Studio 18 2026" -A x64 -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_64_release --config Release --target install
 ```
 

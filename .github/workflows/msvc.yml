@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x86", "x64"]
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
 
     steps:
     - name: Checkout
@@ -55,7 +55,7 @@ jobs:
     - name: Build spi
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
-        cmake -G "Visual Studio 17 2022" -A ${{env.MSVC_ARCH}} `
+        cmake -G "Visual Studio 18 2026" -A ${{env.MSVC_ARCH}} `
         -B build_${{env.MSVC_ARCH}}_release `
         -DCMAKE_INSTALL_PREFIX=out_${{env.MSVC_ARCH}}_release `
         -DCMAKE_BUILD_TYPE=Release
