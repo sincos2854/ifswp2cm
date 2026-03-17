@@ -1,7 +1,6 @@
 // Copyright (c) 2023 - 2026 sincos2854
 // Licensed under the MIT License
 
-#include <string>
 #include "common.h"
 #include "ifswp2cm.h"
 
@@ -65,9 +64,7 @@ static int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
 
 static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<BYTE[]>& file_data, size_t& file_size)
 {
-    auto handle = FileHandle(
-        CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL)
-    );
+    auto handle = FileHandle(CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
     if (handle.get() == INVALID_HANDLE_VALUE)
     {
         return SPI_FILE_READ_ERROR;
@@ -150,23 +147,23 @@ int __stdcall GetPluginInfoW(int infono, LPWSTR buf, int buflen)
     return static_cast<int>(wcslen(buf));
 }
 
-int __stdcall IsSupported(LPCSTR filename, DWORD_PTR dw)
+int __stdcall IsSupported(LPCSTR filename, LPCVOID dw)
 {
     std::wstring unicode;
     AnsiToUnicode(filename, unicode);
     return IsSupportedW(unicode.c_str(), dw);
 }
 
-int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
+int __stdcall IsSupportedW(LPCWSTR filename, LPCVOID dw)
 {
     std::unique_ptr<BYTE[]> buf;
-    BYTE* data = nullptr;
+    LPCBYTE data = nullptr;
     DWORD read_size = 0;
 
-    if ((dw & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
+    if ((reinterpret_cast<DWORD_PTR>(dw) & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
     {
         buf = std::make_unique_for_overwrite<BYTE[]>(BUF_SIZE_HEADER);
-        if (!ReadFile(reinterpret_cast<HANDLE>(dw), buf.get(), BUF_SIZE_HEADER, &read_size, NULL))
+        if (!ReadFile(const_cast<LPVOID>(dw), buf.get(), BUF_SIZE_HEADER, &read_size, NULL))
         {
             return 0;
         }
@@ -178,7 +175,7 @@ int __stdcall IsSupportedW(LPCWSTR filename, DWORD_PTR dw)
     }
     else
     {
-        data = reinterpret_cast<BYTE*>(dw);
+        data = static_cast<LPCBYTE>(dw);
     }
 
     if (IsSupportedEx(filename, data))
@@ -220,10 +217,10 @@ int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, UINT flag, PictureInfo*
         return GetPictureInfoEx(buf, file_data.get(), file_size, lpInfo);
     }
 
-    return GetPictureInfoEx(NULL, reinterpret_cast<const BYTE*>(buf), len, lpInfo);
+    return GetPictureInfoEx(nullptr, reinterpret_cast<LPCBYTE>(buf), len, lpInfo);
 }
 
-int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     std::wstring unicode;
     if ((flag & 7) == 0)
@@ -233,7 +230,7 @@ int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, H
     return GetPictureW(unicode.c_str(), len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     if (!pHBInfo || !pHBm)
     {
@@ -254,15 +251,15 @@ int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo,
         return GetPictureEx(buf, file_data.get(), file_size, pHBInfo, pHBm, lpPrgressCallback, lData);
     }
 
-    return GetPictureEx(NULL, reinterpret_cast<const BYTE*>(buf), len, pHBInfo, pHBm, lpPrgressCallback, lData);
+    return GetPictureEx(nullptr, reinterpret_cast<LPCBYTE>(buf), len, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     return GetPicture(buf, len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }
 
-int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, UINT flag, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     return GetPictureW(buf, len, flag, pHBInfo, pHBm, lpPrgressCallback, lData);
 }

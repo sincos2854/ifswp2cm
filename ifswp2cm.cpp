@@ -5,7 +5,7 @@
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
 
-bool IsSupportedEx(LPCWSTR filename, const BYTE* data)
+bool IsSupportedEx(LPCWSTR filename, LPCBYTE data)
 {
     if (!data)
     {
@@ -21,7 +21,7 @@ bool IsSupportedEx(LPCWSTR filename, const BYTE* data)
     return false;
 }
 
-int GetPictureInfoEx(LPCWSTR file_name, const BYTE* data, size_t size, PictureInfo* lpInfo)
+int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE data, size_t size, PictureInfo* lpInfo)
 {
     if (!IsSupportedEx(file_name, data))
     {
@@ -43,7 +43,7 @@ int GetPictureInfoEx(LPCWSTR file_name, const BYTE* data, size_t size, PictureIn
     return SPI_ALL_RIGHT;
 }
 
-int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
 {
     if (!IsSupportedEx(file_name, data))
     {
@@ -104,7 +104,7 @@ int GetPictureEx(LPCWSTR file_name, const BYTE* data, size_t size, HANDLE* pHBIn
         v5->bV5ProfileData = sizeof(BITMAPV5HEADER);
         v5->bV5ProfileSize = static_cast<DWORD>(writer.size_);
 
-        std::memcpy(reinterpret_cast<BYTE*>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
+        std::memcpy(reinterpret_cast<LPBYTE>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
     }
 
     if (!h_bitmap_info)
