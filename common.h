@@ -53,6 +53,9 @@ public:
         }
     }
 
+    AutoUnlockBitmapHeader(const AutoUnlockBitmapHeader&) = delete;
+    AutoUnlockBitmapHeader& operator=(const AutoUnlockBitmapHeader&) = delete;
+
     bool MakeV5Header(void)
     {
         if (locked_v5_)
@@ -105,6 +108,9 @@ public:
             LocalUnlock(handle_);
         }
     }
+
+    AutoUnlockBitmap(const AutoUnlockBitmap&) = delete;
+    AutoUnlockBitmap& operator=(const AutoUnlockBitmap&) = delete;
 
     LPBYTE GetBitmap(void) const
     {
