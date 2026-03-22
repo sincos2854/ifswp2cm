@@ -5,15 +5,15 @@
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
 
-bool IsSupportedEx(LPCWSTR filename, LPCBYTE data)
+bool IsSupportedEx(LPCWSTR file_name, LPCBYTE file_data)
 {
-    if (!data)
+    if (!file_data)
     {
         return false;
     }
 
     // Check the file header
-    if (std::memcmp(data, "\xF4\xFF\x6F", 3) == 0)
+    if (std::memcmp(file_data, "\xF4\xFF\x6F", 3) == 0)
     {
         return true;
     }
@@ -21,38 +21,38 @@ bool IsSupportedEx(LPCWSTR filename, LPCBYTE data)
     return false;
 }
 
-int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE data, size_t size, PictureInfo* lpInfo)
+int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, PictureInfo* lp_info)
 {
-    if (!IsSupportedEx(file_name, data))
+    if (!IsSupportedEx(file_name, file_data))
     {
         return SPI_NOT_SUPPORT;
     }
 
     WP2::BitstreamFeatures features{};
 
-    if (features.Read(data, size) != WP2_STATUS_OK)
+    if (features.Read(file_data, file_size) != WP2_STATUS_OK)
     {
         return SPI_OUT_OF_ORDER;
     }
 
-    *lpInfo = {};
-    lpInfo->width = features.raw_width;
-    lpInfo->height = features.raw_height;
-    lpInfo->colorDepth = 32;
+    *lp_info = {};
+    lp_info->width = features.raw_width;
+    lp_info->height = features.raw_height;
+    lp_info->colorDepth = 32;
 
     return SPI_ALL_RIGHT;
 }
 
-int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, HANDLE* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData)
+int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HANDLE* out_bitmap_info, HANDLE* out_bitmap, SUSIE_PROGRESS lp_callback, LONG_PTR lp_data)
 {
-    if (!IsSupportedEx(file_name, data))
+    if (!IsSupportedEx(file_name, file_data))
     {
         return SPI_NOT_SUPPORT;
     }
 
-    if (lpPrgressCallback)
+    if (lp_callback)
     {
-        if (lpPrgressCallback(0, 100, lData))
+        if (lp_callback(0, 100, lp_data))
         {
             return SPI_ABORT;
         }
@@ -63,7 +63,7 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, 
 
     WP2::BitstreamFeatures features{};
 
-    if (features.Read(data, size) != WP2_STATUS_OK)
+    if (features.Read(file_data, file_size) != WP2_STATUS_OK)
     {
         return SPI_OUT_OF_ORDER;
     }
@@ -78,7 +78,7 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, 
     {
         WP2::MemoryWriter writer;
 
-        if (WP2::GetChunk(data, size, WP2::ChunkType::kIcc, &writer) != WP2_STATUS_OK)
+        if (WP2::GetChunk(file_data, file_size, WP2::ChunkType::kIcc, &writer) != WP2_STATUS_OK)
         {
             return SPI_OUT_OF_ORDER;
         }
@@ -173,7 +173,7 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, 
 
     config.thread_level = info.dwNumberOfProcessors - 1;
 
-    if (WP2::Decode(data, size, &output_buffer, config) != WP2_STATUS_OK)
+    if (WP2::Decode(file_data, file_size, &output_buffer, config) != WP2_STATUS_OK)
     {
         return SPI_OUT_OF_ORDER;
     }
@@ -188,9 +188,9 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, 
         std::memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
     }
 
-    if (lpPrgressCallback)
+    if (lp_callback)
     {
-        if (lpPrgressCallback(100, 100, lData))
+        if (lp_callback(100, 100, lp_data))
         {
             return SPI_ABORT;
         }
@@ -199,8 +199,8 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HANDLE* pHBInfo, 
     auto_unlock_header.reset();
     auto_unlock_bitmap.reset();
 
-    *pHBInfo = h_bitmap_info.get();
-    *pHBm = h_bitmap.get();
+    *out_bitmap_info = h_bitmap_info.get();
+    *out_bitmap = h_bitmap.get();
 
     h_bitmap_info.release();
     h_bitmap.release();

@@ -35,7 +35,7 @@ class AutoUnlockBitmapHeader
 public:
     AutoUnlockBitmapHeader(HLOCAL handle) : handle_(handle)
     {
-        if (handle_ != nullptr)
+        if (handle_)
         {
             locked_header_ = reinterpret_cast<LPBITMAPINFOHEADER>(LocalLock(handle_));
             if (locked_header_ != nullptr && locked_header_->biSize == sizeof(BITMAPV5HEADER))
@@ -47,7 +47,7 @@ public:
 
     ~AutoUnlockBitmapHeader()
     {
-        if (locked_header_ != nullptr)
+        if (locked_header_)
         {
             LocalUnlock(handle_);
         }
@@ -55,14 +55,14 @@ public:
 
     bool MakeV5Header(void)
     {
-        if (locked_v5_ != nullptr)
+        if (locked_v5_)
         {
             return true;
         }
-        else if (locked_header_ != nullptr)
+        else if (locked_header_)
         {
             locked_v5_ = reinterpret_cast<LPBITMAPV5HEADER>(locked_header_);
-            if (locked_v5_ != nullptr)
+            if (locked_v5_)
             {
                 return true;
             }
@@ -92,7 +92,7 @@ class AutoUnlockBitmap
 public:
     AutoUnlockBitmap(HLOCAL handle) : handle_(handle)
     {
-        if (handle_ != nullptr)
+        if (handle_)
         {
             locked_bitmap_ = reinterpret_cast<LPBYTE>(LocalLock(handle_));
         }
@@ -100,7 +100,7 @@ public:
 
     ~AutoUnlockBitmap()
     {
-        if (locked_bitmap_ != nullptr)
+        if (locked_bitmap_)
         {
             LocalUnlock(handle_);
         }

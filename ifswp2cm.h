@@ -20,6 +20,6 @@ constexpr std::wstring_view PLUGIN_INFO[]{
 
 constexpr size_t HEADER_MIN_SIZE = 3;
 
-bool IsSupportedEx(LPCWSTR filename, LPCBYTE data);
-int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE data, size_t size, PictureInfo* lpInfo);
-int GetPictureEx(LPCWSTR file_name, LPCBYTE data, size_t size, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+bool IsSupportedEx(LPCWSTR fil_ename, LPCBYTE file_data);
+int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, PictureInfo* lp_info);
+int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL* out_bitmap_info, HLOCAL* out_bitmap, SUSIE_PROGRESS lp_callback, LONG_PTR lp_data);

@@ -20,7 +20,8 @@ constexpr int SPI_FILE_WRITE_ERROR =  9;    // Can't write file (Non-public erro
 constexpr int SPI_END_OF_FILE      = 10;    // End of file (Non-public error code)
 
 #pragma pack(push, 1)
-struct PictureInfo {
+struct PictureInfo
+{
     long left, top;
     long width;
     long height;
@@ -34,14 +35,15 @@ struct PictureInfo {
 };
 #pragma pack(pop)
 
-typedef int(CALLBACK* ProgressCallback)(int, int, LONG_PTR);
+using SUSIE_PROGRESS = int(__stdcall*)(int, int, LONG_PTR);
+
 EXTERN_C int __stdcall GetPluginInfo(int infono, LPSTR buf, int buflen);
 EXTERN_C int __stdcall GetPluginInfoW(int infono, LPWSTR buf, int buflen);
 EXTERN_C int __stdcall IsSupported(LPCSTR filename, LPCVOID dw);
 EXTERN_C int __stdcall IsSupportedW(LPCWSTR filename, LPCVOID dw);
 EXTERN_C int __stdcall GetPictureInfo(LPCSTR buf, LONG_PTR len, UINT flag, PictureInfo* lpInfo);
 EXTERN_C int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, UINT flag, PictureInfo* lpInfo);
-EXTERN_C int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
-EXTERN_C int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, ProgressCallback lpPrgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPicture(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, SUSIE_PROGRESS lpProgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, SUSIE_PROGRESS lpProgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPreview(LPCSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, SUSIE_PROGRESS lpProgressCallback, LONG_PTR lData);
+EXTERN_C int __stdcall GetPreviewW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo, HLOCAL* pHBm, SUSIE_PROGRESS lpProgressCallback, LONG_PTR lData);
