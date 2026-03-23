@@ -43,7 +43,7 @@ int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, Pic
     return SPI_ALL_RIGHT;
 }
 
-int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HANDLE* out_bitmap_info, HANDLE* out_bitmap, SUSIE_PROGRESS lp_callback, LONG_PTR lp_data)
+int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL* out_bitmap_info, HLOCAL* out_bitmap, SUSIE_PROGRESS lp_callback, LONG_PTR lp_data)
 {
     if (!IsSupportedEx(file_name, file_data))
     {
