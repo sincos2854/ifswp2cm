@@ -199,11 +199,8 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
     auto_unlock_header.reset();
     auto_unlock_bitmap.reset();
 
-    *out_bitmap_info = h_bitmap_info.get();
-    *out_bitmap = h_bitmap.get();
-
-    h_bitmap_info.release();
-    h_bitmap.release();
+    *out_bitmap_info = h_bitmap_info.release();
+    *out_bitmap = h_bitmap.release();
 
     return SPI_ALL_RIGHT;
 }
