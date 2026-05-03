@@ -149,7 +149,7 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
         AutoUnlockBitmap auto_unlock_bitmap(h_bitmap.get());
         auto bitmap = auto_unlock_bitmap.GetBitmap();
 
-        if(!bitmap)
+        if (!bitmap)
         {
             return SPI_MEMORY_ERROR;
         }
