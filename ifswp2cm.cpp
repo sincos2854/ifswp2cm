@@ -90,14 +90,14 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
             return SPI_NO_MEMORY;
         }
 
-        auto auto_unlock_header = std::make_unique<AutoUnlockBitmapHeader>(h_bitmap_info.get());
+        AutoUnlockBitmapHeader auto_unlock_header(h_bitmap_info.get());
 
-        if (!auto_unlock_header->MakeV5Header())
+        if (!auto_unlock_header.MakeV5Header())
         {
             return SPI_MEMORY_ERROR;
         }
 
-        auto v5 = auto_unlock_header->GetV5Header();
+        auto v5 = auto_unlock_header.GetV5Header();
 
         v5->bV5Size = sizeof(BITMAPV5HEADER);
         v5->bV5CSType = PROFILE_EMBEDDED;
@@ -107,85 +107,89 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
         std::memcpy(reinterpret_cast<LPBYTE>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
     }
 
-    if (!h_bitmap_info)
+    // Ensure AutoUnlockBitmapHeader and AutoUnlockBitmap are destroyed at the end of this block
     {
-        h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)));
-
         if (!h_bitmap_info)
+        {
+            h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)));
+
+            if (!h_bitmap_info)
+            {
+                return SPI_NO_MEMORY;
+            }
+        }
+
+        AutoUnlockBitmapHeader auto_unlock_header(h_bitmap_info.get());
+        auto bitmap_header = auto_unlock_header.GetBitmapHeader();
+
+        if (!bitmap_header)
+        {
+            return SPI_MEMORY_ERROR;
+        }
+
+        if (!auto_unlock_header.GetV5Header())
+        {
+            bitmap_header->biSize = sizeof(BITMAPINFOHEADER);
+        }
+
+        bitmap_header->biWidth = width;
+        bitmap_header->biHeight = height;
+        bitmap_header->biPlanes = 1;
+        bitmap_header->biBitCount = 32;
+        bitmap_header->biSizeImage = static_cast<DWORD>(bitmap_size);
+
+        // Decode the image
+        h_bitmap = PictureHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
+
+        if (!h_bitmap)
         {
             return SPI_NO_MEMORY;
         }
-    }
 
-    auto auto_unlock_header = std::make_unique<AutoUnlockBitmapHeader>(h_bitmap_info.get());
-    auto bitmap_header = auto_unlock_header->GetBitmapHeader();
+        AutoUnlockBitmap auto_unlock_bitmap(h_bitmap.get());
+        auto bitmap = auto_unlock_bitmap.GetBitmap();
 
-    if (!bitmap_header)
-    {
-        return SPI_MEMORY_ERROR;
-    }
+        if(!bitmap)
+        {
+            return SPI_MEMORY_ERROR;
+        }
 
-    if (!auto_unlock_header->GetV5Header())
-    {
-        bitmap_header->biSize = sizeof(BITMAPINFOHEADER);
-    }
+        WP2::ArgbBuffer output_buffer;
 
-    bitmap_header->biWidth = width;
-    bitmap_header->biHeight = height;
-    bitmap_header->biPlanes = 1;
-    bitmap_header->biBitCount = 32;
-    bitmap_header->biSizeImage = static_cast<DWORD>(bitmap_size);
+        if (output_buffer.SetFormat(WP2_BGRA_32) != WP2_STATUS_OK)
+        {
+            return SPI_OTHER_ERROR;
+        }
 
-    // Decode the image
-    h_bitmap = PictureHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
+        if (output_buffer.SetExternal(width, height, bitmap, stride) != WP2_STATUS_OK)
+        {
+            return SPI_OTHER_ERROR;
+        }
 
-    if (!h_bitmap)
-    {
-        return SPI_NO_MEMORY;
-    }
+        // The number of logical processors in the current group.
+        SYSTEM_INFO info{};
 
-    auto auto_unlock_bitmap = std::make_unique<AutoUnlockBitmap>(h_bitmap.get());
-    auto bitmap = auto_unlock_bitmap->GetBitmap();
+        GetSystemInfo(&info);
 
-    if(!bitmap)
-    {
-        return SPI_MEMORY_ERROR;
-    }
+        WP2::DecoderConfig config;
 
-    WP2::ArgbBuffer output_buffer;
+        config.thread_level = info.dwNumberOfProcessors - 1;
 
-    if (output_buffer.SetFormat(WP2_BGRA_32) != WP2_STATUS_OK)
-    {
-        return SPI_OTHER_ERROR;
-    }
+        if (WP2::Decode(file_data, file_size, &output_buffer, config) != WP2_STATUS_OK)
+        {
+            return SPI_OUT_OF_ORDER;
+        }
 
-    if (output_buffer.SetExternal(width, height, bitmap, stride) != WP2_STATUS_OK)
-    {
-        return SPI_OTHER_ERROR;
-    }
+        // Flip the bitmap vertically
+        size_t half_height = static_cast<size_t>(height) / 2;
+        auto line = std::make_unique_for_overwrite<BYTE[]>(stride);
 
-    // The number of logical processors in the current group.
-    SYSTEM_INFO info{};
-
-    GetSystemInfo(&info);
-
-    WP2::DecoderConfig config;
-
-    config.thread_level = info.dwNumberOfProcessors - 1;
-
-    if (WP2::Decode(file_data, file_size, &output_buffer, config) != WP2_STATUS_OK)
-    {
-        return SPI_OUT_OF_ORDER;
-    }
-
-    // Flip the bitmap
-    size_t half_height = static_cast<size_t>(height) / 2;
-    auto line = std::make_unique_for_overwrite<BYTE[]>(stride);
-    for (size_t i = 0; i < half_height; i++)
-    {
-        std::memcpy(line.get(), bitmap + stride * i, stride);
-        std::memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
-        std::memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
+        for (size_t i = 0; i < half_height; i++)
+        {
+            std::memcpy(line.get(), bitmap + stride * i, stride);
+            std::memcpy(bitmap + stride * i, bitmap + stride * (height - i - 1), stride);
+            std::memcpy(bitmap + stride * (height - i - 1), line.get(), stride);
+        }
     }
 
     if (lp_callback)
@@ -195,9 +199,6 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
             return SPI_ABORT;
         }
     }
-
-    auto_unlock_header.reset();
-    auto_unlock_bitmap.reset();
 
     *out_bitmap_info = h_bitmap_info.release();
     *out_bitmap = h_bitmap.release();
