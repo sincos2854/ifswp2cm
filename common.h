@@ -38,7 +38,7 @@ public:
         if (handle_)
         {
             locked_header_ = reinterpret_cast<LPBITMAPINFOHEADER>(LocalLock(handle_));
-            if (locked_header_ != nullptr && locked_header_->biSize == sizeof(BITMAPV5HEADER))
+            if (locked_header_ && locked_header_->biSize == sizeof(BITMAPV5HEADER))
             {
                 locked_v5_ = reinterpret_cast<LPBITMAPV5HEADER>(locked_header_);
             }
