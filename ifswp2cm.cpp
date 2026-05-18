@@ -5,7 +5,7 @@
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
 
-bool IsSupportedEx(LPCWSTR file_name, LPCBYTE file_data)
+bool IsSupportedEx(LPCWSTR /* file_name */, LPCBYTE file_data)
 {
     if (!file_data)
     {
