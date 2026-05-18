@@ -3,7 +3,6 @@
 
 #pragma once
 
-#define NOMINMAX
 #include <windows.h>
 
 constexpr int SPI_NO_FUNCTION      = -1;    // Unimplemented function
