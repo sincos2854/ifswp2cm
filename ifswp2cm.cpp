@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ifswp2cm.h"
 #include "wp2/decode.h"
+#include <cstring>
 
 bool IsSupportedEx(LPCWSTR /* file_name */, LPCBYTE file_data)
 {
