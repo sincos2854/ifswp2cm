@@ -1,41 +1,45 @@
 # ifswp2cm
 
-Susie Plug-in for [WebP 2](https://chromium.googlesource.com/codecs/libwebp2/)(*.wp2) file.
+A Susie Plug-in for [WebP 2](https://chromium.googlesource.com/codecs/libwebp2/) (`*.wp2`) files.
 
 ## Download
 
-From Releases page
+Download from the [Releases](https://github.com/sincos2854/ifswp2cm/releases) page.
 
 ## Features
 
-- 32bit(.spi) and 64bit(.sph)
-- ANSI and Unicode (e.g. GetPicture and GetPictureW)
-- Always returns a 32bit BGRA bitmap
-- ICC Profile (Need a viewer that supports color management like [susico](http://www.vector.co.jp/soft/dl/winnt/art/se515212.html))
+- 32-bit (`.spi`) and 64-bit (`.sph`) support
+- ANSI and Unicode support (e.g., `GetPicture` and `GetPictureW`)
+- Always returns a 32-bit BGRA bitmap
+- ICC profile support (requires a viewer that supports color management, such as [susico](http://www.vector.co.jp/soft/dl/winnt/art/se515212.html))
 
 ## Building
 
-Checking out tht source code
+### Checking out the source code
 
 ```bash
 git clone https://github.com/sincos2854/ifswp2cm.git --recursive --shallow-submodules
 ```
 
-Visual Studio 32bit (.spi)
+### Windows
+
+Building with Visual Studio (32-bit, `.spi`)
 
 ```bat
 cmake -G "Visual Studio 18 2026" -A Win32 -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_32_release --config Release --target install
 ```
 
-Visual Studio 64bit (.sph)
+Building with Visual Studio (64-bit, `.sph`)
 
 ```bat
 cmake -G "Visual Studio 18 2026" -A x64 -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_64_release --config Release --target install
 ```
 
-Cross-compilation environment
+### Cross-compilation
+
+Setting up the cross-compilation environment
 
 ```bash
 sudo apt install cmake ninja-build mingw-w64
@@ -45,17 +49,17 @@ sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g+
 sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
 ```
 
-Cross-compilation 32bit (.spi)
+Cross-compiling (32-bit, `.spi`)
 
 ```bash
-cmake -G Ninja -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++
+cmake -G Ninja -DCMAKE_C_COMPILER=i686-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=i686-w64-mingw32-g++ -DCMAKE_SYSTEM_NAME=Windows -B build_32_release -DCMAKE_INSTALL_PREFIX=out_32_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_32_release --config Release --target install
 ```
 
-Cross-compilation 64bit (.sph)
+Cross-compiling (64-bit, `.sph`)
 
 ```bash
-cmake -G Ninja -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+cmake -G Ninja -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ -DCMAKE_SYSTEM_NAME=Windows -B build_64_release -DCMAKE_INSTALL_PREFIX=out_64_release -DCMAKE_BUILD_TYPE=Release
 cmake --build build_64_release --config Release --target install
 ```
 
