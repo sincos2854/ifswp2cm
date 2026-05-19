@@ -1,28 +1,53 @@
 # Copyright (c) 2023 - 2026 sincos2854
 # Licensed under the MIT License
 
-cmake_minimum_required(VERSION 3.22...4.2)
+cmake_minimum_required(VERSION 3.24...4.2)
 
 project(ifswp2cm LANGUAGES C CXX VERSION 0.3.12)
-set(CMAKE_CXX_STANDARD 20)
 
-# Write ifswp2cm version number in version.h
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Write ifswp2cm version number in version.h.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
-set(CMAKE_SHARED_LIBRARY_PREFIX "") # Don't prefix file names with "lib"
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Use /MT option instead of /MD option.")
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Make libwebp2 a static build.")
-set(WP2_BUILD_TESTS OFF CACHE BOOL "")
-set(WP2_ENABLE_TESTS OFF CACHE BOOL "")
-set(WP2_BUILD_EXAMPLES OFF CACHE BOOL "")
-set(WP2_BUILD_EXTRAS OFF CACHE BOOL "")
+# Don't prefix file names with "lib".
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
+
+# Use /MT option instead of /MD.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+# Make libwebp2 a static build.
+set(BUILD_SHARED_LIBS OFF)
+
+# libwebp2 options
+option(WP2_BUILD_TESTS "" OFF)
+option(WP2_ENABLE_TESTS "" OFF)
+option(WP2_BUILD_EXAMPLES "" OFF)
+option(WP2_BUILD_EXTRAS "" OFF)
+
+# Position-independent code(PIC)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Link Time Optimization(LTO)
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result OUTPUT output)
+if(result)
+  message(STATUS "IPO/LTO is supported.")
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON CACHE BOOL "")
+else()
+  message(STATUS "IPO/LTO is not supported: ${output}")
+endif()
 
 set(LIBWEBP2_NAME "libwebp2")
 set(LIBWEBP2_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/${LIBWEBP2_NAME})
+if(NOT EXISTS ${LIBWEBP2_SRC_DIR}/CMakeLists.txt)
+  message(FATAL_ERROR "libwebp2 submodule not found. Run: git submodule update --init --recursive")
+endif()
 
-message(STATUS "CMAKE_HOST_SYSTEM_NAME = ${CMAKE_HOST_SYSTEM_NAME}")
-message(STATUS "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "${LIBWEBP2_NAME} SOURCE DIR = ${LIBWEBP2_SRC_DIR}")
+message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "${LIBWEBP2_NAME} SOURCE DIR: ${LIBWEBP2_SRC_DIR}")
 
 # Since Linux can't read "Windows.h", replace it with "windows.h".
 if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
@@ -32,15 +57,15 @@ if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
   )
 endif()
 
-# Add libwebp2 directory
+# Add libwebp2 directory.
 add_subdirectory(${LIBWEBP2_SRC_DIR})
 
 set(DLL_NAME "ifswp2cm")
 
-# Creating ifswp2cm
+# Create ifswp2cm.
 add_library(${DLL_NAME} SHARED spi00in.cpp ifswp2cm.cpp spi00in.def)
-target_include_directories(${DLL_NAME} PRIVATE ${LIBWEBP2_SRC_DIR}/src)
-target_link_libraries(${DLL_NAME} webp2)
+target_include_directories(${DLL_NAME} SYSTEM PRIVATE ${LIBWEBP2_SRC_DIR}/src)
+target_link_libraries(${DLL_NAME} PRIVATE webp2)
 
 # .spi extension for 32bit version, .sph extension for 64bit version
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -51,15 +76,11 @@ else()
   set_target_properties(${DLL_NAME} PROPERTIES SUFFIX ".sph")
 endif()
 
-target_compile_definitions(${DLL_NAME} PRIVATE _USRDLL UNICODE _UNICODE)
-
 if(MSVC)
-  target_compile_options(${DLL_NAME} PRIVATE /W3)
+  target_compile_options(${DLL_NAME} PRIVATE /W4 /external:anglebrackets /external:W0)
 else()
-  target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra)
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_link_options(${DLL_NAME} PRIVATE -s)
-  endif()
+  target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra -Wno-multichar)
+  target_link_options(${DLL_NAME} PRIVATE $<$<CONFIG:Release>:-s>)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_link_options(${DLL_NAME} PRIVATE -static)
   endif()
@@ -68,4 +89,4 @@ else()
   endif()
 endif()
 
-install(TARGETS ${DLL_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS ${DLL_NAME} RUNTIME DESTINATION .)
