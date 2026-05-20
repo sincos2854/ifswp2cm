@@ -76,6 +76,8 @@ else()
   set_target_properties(${DLL_NAME} PROPERTIES SUFFIX ".sph")
 endif()
 
+target_compile_definitions(${DLL_NAME} PRIVATE NOMINMAX)
+
 if(MSVC)
   target_compile_options(${DLL_NAME} PRIVATE /W4 /external:anglebrackets /external:W0)
 else()
