@@ -1,7 +1,8 @@
 // Copyright (c) 2023 - 2026 sincos2854
 // Licensed under the MIT License
 
-#include "common.h"
+#include "spi00in.h"
+#include "file_handle.h"
 #include "ifswp2cm.h"
 
 constexpr size_t BUF_SIZE_HEADER = 2048;

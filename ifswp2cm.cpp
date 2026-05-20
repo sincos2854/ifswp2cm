@@ -1,9 +1,9 @@
 // Copyright (c) 2023 - 2026 sincos2854
 // Licensed under the MIT License
 
-#include "common.h"
 #include "ifswp2cm.h"
-#include "wp2/decode.h"
+#include "bitmap_handle.h"
+#include <wp2/decode.h>
 #include <cstring>
 
 bool IsSupportedEx(LPCWSTR /* file_name */, LPCBYTE file_data)
@@ -59,8 +59,8 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
         }
     }
 
-    PictureHandle h_bitmap_info;
-    PictureHandle h_bitmap;
+    LocalMemHandle h_bitmap_info;
+    LocalMemHandle h_bitmap;
 
     WP2::BitstreamFeatures features{};
 
@@ -84,21 +84,21 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
             return SPI_OUT_OF_ORDER;
         }
 
-        h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_));
+        h_bitmap_info = LocalMemHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPV5HEADER) + writer.size_));
 
         if (!h_bitmap_info)
         {
             return SPI_NO_MEMORY;
         }
 
-        AutoUnlockBitmapHeader auto_unlock_header(h_bitmap_info.get());
+        LockedBitmapHeader locked_header(h_bitmap_info.get());
 
-        if (!auto_unlock_header.MakeV5Header())
+        if (!locked_header.InitializeAsV5())
         {
             return SPI_MEMORY_ERROR;
         }
 
-        auto v5 = auto_unlock_header.GetV5Header();
+        auto v5 = locked_header.GetV5Header();
 
         v5->bV5Size = sizeof(BITMAPV5HEADER);
         v5->bV5CSType = PROFILE_EMBEDDED;
@@ -108,11 +108,11 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
         std::memcpy(reinterpret_cast<LPBYTE>(v5) + v5->bV5ProfileData, writer.mem_, v5->bV5ProfileSize);
     }
 
-    // Ensure AutoUnlockBitmapHeader and AutoUnlockBitmap are destroyed at the end of this block
+    // Ensure LockedBitmapHeader and LockedBitmap are destroyed at the end of this block
     {
         if (!h_bitmap_info)
         {
-            h_bitmap_info = PictureHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)));
+            h_bitmap_info = LocalMemHandle(LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO)));
 
             if (!h_bitmap_info)
             {
@@ -120,15 +120,15 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
             }
         }
 
-        AutoUnlockBitmapHeader auto_unlock_header(h_bitmap_info.get());
-        auto bitmap_header = auto_unlock_header.GetBitmapHeader();
+        LockedBitmapHeader locked_header(h_bitmap_info.get());
+        auto bitmap_header = locked_header.GetBitmapHeader();
 
         if (!bitmap_header)
         {
             return SPI_MEMORY_ERROR;
         }
 
-        if (!auto_unlock_header.GetV5Header())
+        if (!locked_header.GetV5Header())
         {
             bitmap_header->biSize = sizeof(BITMAPINFOHEADER);
         }
@@ -140,15 +140,15 @@ int GetPictureEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, HLOCAL*
         bitmap_header->biSizeImage = static_cast<DWORD>(bitmap_size);
 
         // Decode the image
-        h_bitmap = PictureHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
+        h_bitmap = LocalMemHandle(LocalAlloc(LMEM_MOVEABLE, bitmap_size));
 
         if (!h_bitmap)
         {
             return SPI_NO_MEMORY;
         }
 
-        AutoUnlockBitmap auto_unlock_bitmap(h_bitmap.get());
-        auto bitmap = auto_unlock_bitmap.GetBitmap();
+        LockedBitmap locked_bitmap(h_bitmap.get());
+        auto bitmap = locked_bitmap.GetBitmap();
 
         if (!bitmap)
         {

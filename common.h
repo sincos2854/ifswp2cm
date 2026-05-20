@@ -4,119 +4,34 @@
 #pragma once
 
 #include <windows.h>
-#include <memory>
 
-struct FileHandleDeleter
+constexpr int SPI_NO_FUNCTION       = -1;    // Function is not implemented
+constexpr int SPI_ALL_RIGHT         =  0;    // Normal termination
+constexpr int SPI_ABORT             =  1;    // Decoding was aborted because the callback function returned non-zero
+constexpr int SPI_NOT_SUPPORT       =  2;    // Unknown format
+constexpr int SPI_OUT_OF_ORDER      =  3;    // Data is corrupt
+constexpr int SPI_NO_MEMORY         =  4;    // Cannot allocate memory
+constexpr int SPI_MEMORY_ERROR      =  5;    // Memory error
+constexpr int SPI_FILE_READ_ERROR   =  6;    // File read error
+constexpr int SPI_WINDOW_ERROR      =  7;    // Cannot open window (Non-public error code)
+constexpr int SPI_OTHER_ERROR       =  8;    // Internal error
+constexpr int SPI_FILE_WRITE_ERROR  =  9;    // Write error (Non-public error code)
+constexpr int SPI_END_OF_FILE       = 10;    // End of file (Non-public error code)
+
+#pragma pack(push, 1)
+struct PictureInfo
 {
-    void operator()(HANDLE handle)
-    {
-        if (handle != INVALID_HANDLE_VALUE)
-        {
-            CloseHandle(handle);
-        }
-    }
+    long left, top;
+    long width;
+    long height;
+    WORD x_density;
+    WORD y_density;
+    short colorDepth;
+#ifdef _WIN64
+    char dummy[2];
+#endif
+    HLOCAL hInfo;
 };
+#pragma pack(pop)
 
-using FileHandle = std::unique_ptr<std::remove_pointer<HANDLE>::type, FileHandleDeleter>;
-
-struct PictureHandleDeleter
-{
-    void operator()(HLOCAL handle)
-    {
-        LocalFree(handle);
-    }
-};
-
-using PictureHandle = std::unique_ptr<std::remove_pointer<HLOCAL>::type, PictureHandleDeleter>;
-
-class AutoUnlockBitmapHeader
-{
-public:
-    AutoUnlockBitmapHeader(HLOCAL handle) : handle_(handle)
-    {
-        if (handle_)
-        {
-            locked_header_ = reinterpret_cast<LPBITMAPINFOHEADER>(LocalLock(handle_));
-            if (locked_header_ && locked_header_->biSize == sizeof(BITMAPV5HEADER))
-            {
-                locked_v5_ = reinterpret_cast<LPBITMAPV5HEADER>(locked_header_);
-            }
-        }
-    }
-
-    ~AutoUnlockBitmapHeader()
-    {
-        if (locked_header_)
-        {
-            LocalUnlock(handle_);
-        }
-    }
-
-    AutoUnlockBitmapHeader(const AutoUnlockBitmapHeader&) = delete;
-    AutoUnlockBitmapHeader& operator=(const AutoUnlockBitmapHeader&) = delete;
-
-    bool MakeV5Header(void)
-    {
-        if (locked_v5_)
-        {
-            return true;
-        }
-        else if (locked_header_)
-        {
-            locked_v5_ = reinterpret_cast<LPBITMAPV5HEADER>(locked_header_);
-            if (locked_v5_)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    LPBITMAPINFOHEADER GetBitmapHeader(void) const
-    {
-        return locked_header_;
-    }
-
-    LPBITMAPV5HEADER GetV5Header(void) const
-    {
-        return locked_v5_;
-    }
-
-private:
-    HLOCAL handle_ = nullptr;
-    LPBITMAPINFOHEADER locked_header_ = nullptr;
-    LPBITMAPV5HEADER locked_v5_ = nullptr;
-};
-
-class AutoUnlockBitmap
-{
-public:
-    AutoUnlockBitmap(HLOCAL handle) : handle_(handle)
-    {
-        if (handle_)
-        {
-            locked_bitmap_ = reinterpret_cast<LPBYTE>(LocalLock(handle_));
-        }
-    }
-
-    ~AutoUnlockBitmap()
-    {
-        if (locked_bitmap_)
-        {
-            LocalUnlock(handle_);
-        }
-    }
-
-    AutoUnlockBitmap(const AutoUnlockBitmap&) = delete;
-    AutoUnlockBitmap& operator=(const AutoUnlockBitmap&) = delete;
-
-    LPBYTE GetBitmap(void) const
-    {
-        return locked_bitmap_;
-    }
-
-private:
-    HLOCAL handle_ = nullptr;
-    LPBYTE locked_bitmap_ = nullptr;
-};
+using SUSIE_PROGRESS = int(__stdcall*)(int, int, LONG_PTR);
