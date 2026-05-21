@@ -49,14 +49,6 @@ message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
 message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR: ${LIBWEBP2_SRC_DIR}")
 
-# Since Linux can't read "Windows.h", replace it with "windows.h".
-if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
-  message(STATUS "Replacing Windows.h with windows.h")
-  execute_process(
-    COMMAND find ${LIBWEBP2_SRC_DIR} -name "*.h" -type f -exec sed -i "s/Windows\.h/windows.h/g" {} +
-  )
-endif()
-
 # Add libwebp2 directory.
 add_subdirectory(${LIBWEBP2_SRC_DIR})
 
