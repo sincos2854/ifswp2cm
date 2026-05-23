@@ -5,7 +5,7 @@
 #include "file_handle.h"
 #include "ifswp2cm.h"
 
-constexpr size_t BUF_SIZE_HEADER = 2048;
+constexpr size_t HEADER_BUF_SIZE = 2048;
 
 static int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
 {
@@ -20,7 +20,8 @@ static int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
         return 0;
     }
 
-    // When the buffer size is insufficient, WideCharToMultiByte returns 0, so it is stored once in std::string.
+    // The ansi buffer may be smaller than the conversion result.
+    // Convert into a sized temporary first, then truncate-copy into ansi below.
     std::string buf(static_cast<size_t>(len) - 1, '\0');
     len = WideCharToMultiByte(CP_ACP, 0, unicode, -1, buf.data(), len, nullptr, nullptr);
     if (len == 0)
@@ -65,7 +66,7 @@ static int AnsiToUnicode(LPCSTR ansi, std::wstring& unicode)
 
 static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::unique_ptr<BYTE[]>& file_data, size_t& file_size)
 {
-    auto handle = FileHandle(CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
+    FileHandle handle(CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
     if (handle.get() == INVALID_HANDLE_VALUE)
     {
         return SPI_FILE_READ_ERROR;
@@ -99,14 +100,14 @@ static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::uniq
 
     size_t remain = file_size, offset = 0;
     DWORD to_read = 0, read = 0;
-    BOOL ret;
+    BOOL result;
 
     while (0 < remain)
     {
         to_read = (ULONG_MAX < remain) ? ULONG_MAX : static_cast<DWORD>(remain);
 
-        ret = ReadFile(handle.get(), file_data.get() + offset, to_read, &read, nullptr);
-        if (!ret || to_read != read)
+        result = ReadFile(handle.get(), file_data.get() + offset, to_read, &read, nullptr);
+        if (!result || to_read != read)
         {
             return SPI_FILE_READ_ERROR;
         }
@@ -121,7 +122,6 @@ static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::uniq
 int __stdcall GetPluginInfo(int infono, LPSTR buf, int buflen)
 {
     wchar_t unicode[MAX_PATH];
-
     if (GetPluginInfoW(infono, unicode, MAX_PATH) == 0)
     {
         return 0;
@@ -163,8 +163,8 @@ int __stdcall IsSupportedW(LPCWSTR filename, LPCVOID dw)
 
     if ((reinterpret_cast<DWORD_PTR>(dw) & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
     {
-        buf = std::make_unique_for_overwrite<BYTE[]>(BUF_SIZE_HEADER);
-        if (!ReadFile(const_cast<LPVOID>(dw), buf.get(), BUF_SIZE_HEADER, &read_size, nullptr))
+        buf = std::make_unique_for_overwrite<BYTE[]>(HEADER_BUF_SIZE);
+        if (!ReadFile(const_cast<LPVOID>(dw), buf.get(), HEADER_BUF_SIZE, &read_size, nullptr))
         {
             return 0;
         }
@@ -209,10 +209,10 @@ int __stdcall GetPictureInfoW(LPCWSTR buf, LONG_PTR len, UINT flag, PictureInfo*
         std::unique_ptr<BYTE[]> file_data;
         size_t file_size = 0;
 
-        int ret = ReadDataFromFile(buf, len, file_data, file_size);
-        if (ret)
+        int result = ReadDataFromFile(buf, len, file_data, file_size);
+        if (result)
         {
-            return ret;
+            return result;
         }
 
         return GetPictureInfoEx(buf, file_data.get(), file_size, lpInfo);
@@ -243,10 +243,10 @@ int __stdcall GetPictureW(LPCWSTR buf, LONG_PTR len, UINT flag, HLOCAL* pHBInfo,
         std::unique_ptr<BYTE[]> file_data;
         size_t file_size = 0;
 
-        int ret = ReadDataFromFile(buf, len, file_data, file_size);
-        if (ret)
+        int result = ReadDataFromFile(buf, len, file_data, file_size);
+        if (result)
         {
-            return ret;
+            return result;
         }
 
         return GetPictureEx(buf, file_data.get(), file_size, pHBInfo, pHBm, lpProgressCallback, lData);
