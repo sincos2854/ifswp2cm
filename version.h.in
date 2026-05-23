@@ -5,4 +5,4 @@
 
 #include <windows.h>
 
-constexpr LPCWSTR PLUGIN_NAME = L"WebP 2 Susie Plug-in v@PROJECT_VERSION@ (c) 2023 - 2026 sincos2854";
+inline constexpr LPCWSTR PLUGIN_NAME = L"WebP 2 Susie Plug-in v@PROJECT_VERSION@ (c) 2023 - 2026 sincos2854";
