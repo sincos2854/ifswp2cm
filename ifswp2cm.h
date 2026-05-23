@@ -19,7 +19,7 @@ inline constexpr std::wstring_view PLUGIN_INFO[]{
 };
 
 inline constexpr char SIGN_BYTES[]{ '\xF4', '\xFF', '\x6F' };
-constexpr size_t MIN_HEADER_SIZE = std::size(SIGN_BYTES);
+inline constexpr size_t MIN_HEADER_SIZE = std::size(SIGN_BYTES);
 
 bool IsSupportedEx(LPCWSTR fil_ename, LPCBYTE file_data);
 int GetPictureInfoEx(LPCWSTR file_name, LPCBYTE file_data, size_t file_size, PictureInfo* lp_info);
