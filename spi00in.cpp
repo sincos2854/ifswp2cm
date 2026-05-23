@@ -5,8 +5,6 @@
 #include "file_handle.h"
 #include "ifswp2cm.h"
 
-constexpr size_t HEADER_BUF_SIZE = 2048;
-
 static int UnicodeToAnsi(LPCWSTR unicode, LPSTR ansi, int size)
 {
     if (!unicode || !unicode[0])
@@ -86,7 +84,7 @@ static int ReadDataFromFile(LPCWSTR file_name, LONG_PTR macbin_offset, std::uniq
 #endif
 
     file_size = static_cast<size_t>(size.QuadPart) - macbin_offset;
-    if (file_size < HEADER_MIN_SIZE)
+    if (file_size < MIN_HEADER_SIZE)
     {
         return SPI_NOT_SUPPORT;
     }
@@ -163,12 +161,12 @@ int __stdcall IsSupportedW(LPCWSTR filename, LPCVOID dw)
 
     if ((reinterpret_cast<DWORD_PTR>(dw) & ~static_cast<DWORD_PTR>(0xFFFF)) == 0)
     {
-        buf = std::make_unique_for_overwrite<BYTE[]>(HEADER_BUF_SIZE);
-        if (!ReadFile(const_cast<LPVOID>(dw), buf.get(), HEADER_BUF_SIZE, &read_size, nullptr))
+        buf = std::make_unique_for_overwrite<BYTE[]>(MIN_HEADER_SIZE);
+        if (!ReadFile(const_cast<LPVOID>(dw), buf.get(), MIN_HEADER_SIZE, &read_size, nullptr))
         {
             return 0;
         }
-        if (read_size < HEADER_MIN_SIZE)
+        if (read_size < MIN_HEADER_SIZE)
         {
             return 0;
         }
