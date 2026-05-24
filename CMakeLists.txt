@@ -49,19 +49,13 @@ set(LIBWEBP2_GIT_TAG "d5920d8fe6abb5b3ba9b9bef3924f18433dd6d37")
 if(NOT EXISTS "${LIBWEBP2_SRC_DIR}/CMakeLists.txt")
   find_package(Git REQUIRED)
   execute_process(
-    COMMAND ${GIT_EXECUTABLE} clone "${LIBWEBP2_GIT_URL}" "${LIBWEBP2_SRC_DIR}"
-    RESULT_VARIABLE git_clone_result
+    COMMAND ${GIT_EXECUTABLE} clone ${LIBWEBP2_GIT_URL} "${LIBWEBP2_SRC_DIR}"
+    COMMAND_ERROR_IS_FATAL ANY
   )
-  if(NOT git_clone_result EQUAL 0)
-    message(FATAL_ERROR "Failed to clone: ${LIBWEBP2_NAME}")
-  endif()
   execute_process(
-    COMMAND ${GIT_EXECUTABLE} -C "${LIBWEBP2_SRC_DIR}" checkout "${LIBWEBP2_GIT_TAG}"
-    RESULT_VARIABLE git_checkout_result
+    COMMAND ${GIT_EXECUTABLE} -C "${LIBWEBP2_SRC_DIR}" checkout ${LIBWEBP2_GIT_TAG}
+    COMMAND_ERROR_IS_FATAL ANY
   )
-  if(NOT git_checkout_result EQUAL 0)
-    message(FATAL_ERROR "Failed to checkout: ${LIBWEBP2_NAME} ${LIBWEBP2_GIT_TAG}")
-  endif()
 endif()
 
 message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
