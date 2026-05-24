@@ -1,3 +1,0 @@
-[submodule "ext/libwebp2"]
-	path = ext/libwebp2
-	url = https://chromium.googlesource.com/codecs/libwebp2/

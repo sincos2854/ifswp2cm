@@ -18,8 +18,10 @@ Download from the [Releases](https://github.com/sincos2854/ifswp2cm/releases) pa
 ### Checking out the source code
 
 ```bash
-git clone https://github.com/sincos2854/ifswp2cm.git --recursive --shallow-submodules
+git clone https://github.com/sincos2854/ifswp2cm.git
 ```
+
+`libwebp2` is automatically fetched into the `libwebp2` directory during the initial CMake configuration. Subsequent builds reuse the existing checkout.
 
 ### Windows
 

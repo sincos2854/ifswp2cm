@@ -17,7 +17,7 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 # Use /MT option instead of /MD.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-# Make libwebp2 a static build.
+# Build libwebp2 as a static library.
 set(BUILD_SHARED_LIBS OFF)
 
 # libwebp2 options
@@ -34,22 +34,41 @@ include(CheckIPOSupported)
 check_ipo_supported(RESULT result OUTPUT output)
 if(result)
   message(STATUS "IPO/LTO is supported.")
-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON CACHE BOOL "")
+  option(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE "" ON)
 else()
   message(STATUS "IPO/LTO is not supported: ${output}")
 endif()
 
 set(LIBWEBP2_NAME "libwebp2")
-set(LIBWEBP2_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/${LIBWEBP2_NAME})
-if(NOT EXISTS ${LIBWEBP2_SRC_DIR}/CMakeLists.txt)
-  message(FATAL_ERROR "libwebp2 submodule not found. Run: git submodule update --init --recursive")
+set(LIBWEBP2_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${LIBWEBP2_NAME}")
+
+set(LIBWEBP2_GIT_URL "https://chromium.googlesource.com/codecs/libwebp2")
+set(LIBWEBP2_GIT_TAG "d5920d8fe6abb5b3ba9b9bef3924f18433dd6d37")
+
+# Fetch libwebp2.
+if(NOT EXISTS "${LIBWEBP2_SRC_DIR}/CMakeLists.txt")
+  find_package(Git REQUIRED)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} clone "${LIBWEBP2_GIT_URL}" "${LIBWEBP2_SRC_DIR}"
+    RESULT_VARIABLE git_clone_result
+  )
+  if(NOT git_clone_result EQUAL 0)
+    message(FATAL_ERROR "Failed to clone: ${LIBWEBP2_NAME}")
+  endif()
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} -C "${LIBWEBP2_SRC_DIR}" checkout "${LIBWEBP2_GIT_TAG}"
+    RESULT_VARIABLE git_checkout_result
+  )
+  if(NOT git_checkout_result EQUAL 0)
+    message(FATAL_ERROR "Failed to checkout: ${LIBWEBP2_NAME} ${LIBWEBP2_GIT_TAG}")
+  endif()
 endif()
 
 message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
 message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR: ${LIBWEBP2_SRC_DIR}")
 
-# Add libwebp2 directory.
+# Add the libwebp2 directory.
 add_subdirectory(${LIBWEBP2_SRC_DIR})
 
 set(DLL_NAME "ifswp2cm")
@@ -59,12 +78,12 @@ add_library(${DLL_NAME} SHARED spi00in.cpp ifswp2cm.cpp spi00in.def)
 target_include_directories(${DLL_NAME} SYSTEM PRIVATE ${LIBWEBP2_SRC_DIR}/src)
 target_link_libraries(${DLL_NAME} PRIVATE webp2)
 
-# .spi extension for 32bit version, .sph extension for 64bit version
+# .spi for the 32-bit version, .sph for the 64-bit version
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-  message(STATUS "Build target is 32-bit.")
+  message(STATUS "Build target: 32-bit")
   set_target_properties(${DLL_NAME} PROPERTIES SUFFIX ".spi")
 else()
-  message(STATUS "Build target is 64-bit.")
+  message(STATUS "Build target: 64-bit")
   set_target_properties(${DLL_NAME} PROPERTIES SUFFIX ".sph")
 endif()
 

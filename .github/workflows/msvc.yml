@@ -22,7 +22,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
       with:
-        submodules: true
         fetch-depth: 1
 
     - name: Set Variables
@@ -69,7 +68,7 @@ jobs:
 
         if("${{matrix.arch}}" -eq "x64")
         {
-          Copy-Item -Path ".\ext\libwebp2\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE\LICENSE_libwebp2"
+          Copy-Item -Path ".\libwebp2\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE\LICENSE_libwebp2"
           Copy-Item -Path ".\LICENSE" -Destination ".\${{env.PROJECT_NAME}}\LICENSE\LICENSE_${{env.PROJECT_NAME}}"
         }
 
