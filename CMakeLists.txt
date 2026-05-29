@@ -5,11 +5,8 @@ cmake_minimum_required(VERSION 3.24...4.2)
 
 project(ifswp2cm LANGUAGES C CXX VERSION 0.4.0)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Write ifswp2cm version number in version.h.
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 # Don't prefix file names with "lib".
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
@@ -26,12 +23,9 @@ option(WP2_ENABLE_TESTS "" OFF)
 option(WP2_BUILD_EXAMPLES "" OFF)
 option(WP2_BUILD_EXTRAS "" OFF)
 
-# Position-independent code(PIC)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 # Link Time Optimization(LTO)
 include(CheckIPOSupported)
-check_ipo_supported(RESULT result OUTPUT output)
+check_ipo_supported(RESULT result OUTPUT output LANGUAGES C CXX)
 if(result)
   message(STATUS "IPO/LTO is supported.")
   option(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE "" ON)
@@ -63,12 +57,14 @@ message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "${LIBWEBP2_NAME} SOURCE DIR: ${LIBWEBP2_SRC_DIR}")
 
 # Add the libwebp2 directory.
-add_subdirectory(${LIBWEBP2_SRC_DIR})
+add_subdirectory(${LIBWEBP2_SRC_DIR} EXCLUDE_FROM_ALL)
 
 set(DLL_NAME "ifswp2cm")
 
 # Create ifswp2cm.
 add_library(${DLL_NAME} SHARED spi00in.cpp ifswp2cm.cpp spi00in.def)
+target_compile_features(${DLL_NAME} PRIVATE cxx_std_20)
+target_include_directories(${DLL_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${DLL_NAME} SYSTEM PRIVATE ${LIBWEBP2_SRC_DIR}/src)
 target_link_libraries(${DLL_NAME} PRIVATE webp2)
 
@@ -87,10 +83,8 @@ if(MSVC)
   target_compile_options(${DLL_NAME} PRIVATE /W4 /external:anglebrackets /external:W0)
 else()
   target_compile_options(${DLL_NAME} PRIVATE -Wall -Wextra -Wno-multichar)
+  target_link_options(${DLL_NAME} PRIVATE -static)
   target_link_options(${DLL_NAME} PRIVATE $<$<CONFIG:Release>:-s>)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_link_options(${DLL_NAME} PRIVATE -static)
-  endif()
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_link_options(${DLL_NAME} PRIVATE -static-libstdc++)
   endif()
